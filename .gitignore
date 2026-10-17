@@ -1,0 +1,7 @@
+﻿# 临时文件
+*.tmp
+*.log
+Thumbs.db
+$RECYCLE.BIN/
+# Office临时文件
+~$*

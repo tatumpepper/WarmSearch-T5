@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>校园失物招领平台 微信小程序 界面原型</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%230081ff'/%3E%3Cpath d='M12 6a4 4 0 0 0-4 4v2H7v6h10v-6h-1v-2a4 4 0 0 0-4-4zm-2 4a2 2 0 1 1 4 0v2h-4v-2z' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+:root{
+  --primary:#0081ff; --primary-deep:#0066cc; --primary-soft:#e8f2ff;
+  --tabbar-on:#87CEFF;
+  --success:#67C23A; --warning:#E6A23C; --danger:#F56C6C; --info:#909399;
+  --text1:#303133; --text2:#606266; --text3:#909399;
+  --border:#dcdfe6; --border-light:#ebeef5; --bg:#f5f7fa;
+  --lv1:#909399; --lv2:#409EFF; --lv3:#67C23A; --lv4:#E6A23C; --lv5:#D4A017;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;color:var(--text1);background:#eef1f6;font-size:14px}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit}
+/* ===== 展示工作台 ===== */
+.stage{display:flex;min-height:100vh;align-items:flex-start}
+.stage-side{width:250px;background:#fff;border-right:1px solid var(--border-light);padding:18px 12px;position:sticky;top:0;height:100vh;overflow:auto;flex-shrink:0}
+.stage-side h2{font-size:16px;color:var(--primary);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.stage-side h2 svg{width:20px;height:20px}
+.stage-side .sub{font-size:12px;color:var(--text3);margin-bottom:14px}
+.stage-side h4{font-size:12px;color:var(--text3);margin:14px 4px 6px;font-weight:600}
+.stage-side a{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:6px;font-size:13px;color:var(--text2);cursor:pointer;margin-bottom:2px}
+.stage-side a:hover{background:var(--primary-soft);color:var(--primary)}
+.stage-side a.on{background:var(--primary-soft);color:var(--primary);font-weight:600}
+.stage-side a .no{font-size:11px;color:var(--text3);font-weight:400}
+.stage-main{flex:1;padding:30px 24px;display:flex;flex-direction:column;align-items:center;min-width:0}
+.stage-title{font-size:13px;color:var(--text3);margin-bottom:16px;text-align:center}
+.stage-title b{color:var(--text1)}
+/* ===== 手机框 ===== */
+.mp-frame{width:375px;background:#f5f6f8;border-radius:28px;border:8px solid #1c1e22;box-shadow:0 12px 40px rgba(0,0,0,.18);overflow:hidden;position:relative;flex-shrink:0}
+.mp-status{display:flex;justify-content:space-between;align-items:center;padding:6px 16px 0;font-size:11px;color:var(--text1);background:#fff}
+.mp-status .dots{display:flex;gap:3px;align-items:center}
+.mp-status .dots i{width:14px;height:4px;border-radius:2px;background:#1c1e22;display:inline-block}
+.mp-status .dots i:first-child{width:5px;height:5px;border-radius:50%}
+.mp-status .dots i:last-child{width:5px;height:5px;border-radius:50%}
+.mp-body{background:var(--bg);height:660px;overflow:hidden;position:relative}
+.mp-body.scroll{overflow-y:auto}
+.mp-body.scroll::-webkit-scrollbar{width:0}
+.mp-head{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fff}
+.mp-head .ttl{font-size:17px;font-weight:600}
+.mp-search{display:flex;align-items:center;gap:6px;flex:1;background:var(--bg);border-radius:16px;padding:7px 12px;font-size:12px;color:var(--text3)}
+.mp-search svg{width:14px;height:14px;flex-shrink:0}
+.mp-ico{width:34px;height:34px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--text2);position:relative;flex-shrink:0}
+.mp-ico svg{width:19px;height:19px}
+.mp-ico .dot{position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--danger);border:1.5px solid #fff}
+.mp-banner{margin:10px;border-radius:12px;background:linear-gradient(135deg,#0081ff,#4da3ff);color:#fff;padding:18px 16px}
+.mp-banner b{font-size:17px;display:block;margin-bottom:4px}
+.mp-banner span{font-size:11px;opacity:.92}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px;padding:12px 6px;background:#fff;border-radius:12px}
+.g4{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+.g4 .gi{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--primary);background:var(--primary-soft)}
+.g4 .gi svg{width:22px;height:22px}
+.g4 .gn{font-size:11px;color:var(--text2)}
+.g4 .gd{font-size:10px;color:var(--text3)}
+.sect{display:flex;justify-content:space-between;align-items:center;padding:10px 14px 6px;font-size:14px;font-weight:600}
+.sect .more{font-size:11px;color:var(--text3);font-weight:400;cursor:pointer}
+.mp-card{display:flex;gap:10px;background:#fff;margin:0 10px 8px;border-radius:12px;padding:10px;cursor:pointer}
+.mp-card .thumb{width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,#eaf3ff,#f6faff);display:flex;align-items:center;justify-content:center;color:#9dc6f2;flex-shrink:0;position:relative}
+.mp-card .thumb svg{width:30px;height:30px}
+.mp-card .thumb .tag{position:absolute;top:4px;right:4px;font-size:9px;padding:1px 4px}
+.mp-card .t{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:600;margin-bottom:5px}
+.mp-card .t span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mp-card .m{font-size:11px;color:var(--text3);line-height:1.7}
+/* ===== 标签 ===== */
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:12px;line-height:1.5;white-space:nowrap}
+.t-valuable{background:#fdeaea;color:#e04e4e;border:1px solid #e8b4b4;font-weight:600}
+.t-pending{background:#fdf6ec;color:#e6a23c;border:1px solid #f3d19e}
+.t-pub{background:#ecf5ff;color:#409eff;border:1px solid #b8d8fb}
+.t-done{background:#f0f9eb;color:#67c23a;border:1px solid #c2e7b0}
+.t-verify{background:#f4f4f5;color:#909399;border:1px solid #d8d8dc}
+.t-queue{background:#f4f0ff;color:#7c5cd6;border:1px solid #cfc3f2}
+.t-rej{background:#f4f4f5;color:#909399;border:1px solid #d8d8dc}
+/* ===== 信用徽章 ===== */
+.lv{display:inline-flex;align-items:center;padding:1px 8px;border-radius:10px;font-size:12px;color:#fff}
+.lv-l1{background:var(--lv1)} .lv-l2{background:var(--lv2)} .lv-l3{background:var(--lv3)} .lv-l4{background:var(--lv4)} .lv-l5{background:var(--lv5)}
+/* ===== 信用条 ===== */
+.credit-tip{display:flex;align-items:center;gap:6px;background:#f0f7ff;border:1px solid #cfe6ff;border-radius:10px;padding:8px 10px;font-size:11px;color:var(--text2);margin:0 10px 10px}
+.credit-tip svg{width:14px;height:14px;color:var(--primary);flex-shrink:0}
+/* ===== 表单 ===== */
+.form-card{background:#fff;margin:10px;border-radius:12px;padding:4px 14px}
+.form-row{display:flex;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--border-light);font-size:13px}
+.form-row:last-child{border-bottom:none}
+.form-row label{width:64px;color:var(--text2);flex-shrink:0}
+.input{flex:1;border:none;outline:none;font-size:13px;color:var(--text1);background:transparent;text-align:right}
+.textarea{flex:1;border:none;outline:none;font-size:13px;min-height:52px;resize:none;text-align:left;padding:2px 0;line-height:1.6;background:transparent}
+.select{flex:1;border:none;outline:none;font-size:13px;color:var(--text1);background:transparent;text-align:right;appearance:none}
+.upload-box{display:flex;gap:8px;padding:10px 0;flex-wrap:wrap}
+.upload-item{width:64px;height:64px;border-radius:8px;background:var(--bg);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3)}
+.upload-item svg{width:20px;height:20px}
+.radio-seg{display:flex;flex-direction:column;gap:4px;flex:1}
+.radio-seg label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text1);cursor:pointer}
+.radio-seg input{accent-color:var(--primary)}
+.btn{display:flex;align-items:center;justify-content:center;border:none;border-radius:22px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.btn:hover{opacity:.88}
+.btn-block{margin:12px 10px;width:calc(100% - 20px)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-ghost{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+.btn-line{background:#fff;color:var(--text2);border:1px solid var(--border)}
+/* ===== tabBar ===== */
+.mp-tabbar{display:flex;background:#fff;border-top:1px solid var(--border-light);padding:5px 0 calc(5px + env(safe-area-inset-bottom));position:absolute;bottom:0;left:0;right:0;z-index:20}
+.mp-tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--text3);cursor:pointer}
+.mp-tabbar a svg{width:22px;height:22px}
+.mp-tabbar a.on{color:var(--tabbar-on);font-weight:600}
+/* ===== 详情 ===== */
+.d-img{height:230px;display:flex;align-items:center;justify-content:center;color:#9dc6f2;background:linear-gradient(135deg,#eaf3ff,#f6faff);position:relative}
+.d-img svg{width:76px;height:76px}
+.d-img .tag{position:absolute;top:12px;left:12px}
+.d-card{background:#fff;padding:14px;margin-top:0}
+.d-card .t{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:700;margin-bottom:8px;flex-wrap:wrap}
+.d-info{font-size:12px;color:var(--text2);line-height:2.1}
+.d-info b{color:var(--danger)}
+/* ===== 信用页 ===== */
+.credit-hero{background:linear-gradient(135deg,#0081ff,#4da3ff);margin:10px;border-radius:12px;padding:16px;color:#fff}
+.credit-hero .row{display:flex;align-items:center;gap:10px}
+.credit-hero .score{font-size:34px;font-weight:800}
+.credit-hero .meta{font-size:11px;margin-top:6px;opacity:.95}
+.credit-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.35);margin-top:10px;overflow:hidden}
+.credit-bar i{display:block;height:100%;background:#fff;border-radius:3px}
+.stat3{display:flex;gap:8px;margin:0 10px}
+.stat3 .st{flex:1;background:#fff;border-radius:10px;padding:10px 4px;text-align:center}
+.stat3 .st .n{font-size:18px;font-weight:700}
+.stat3 .st .l{font-size:10px;color:var(--text3);margin-top:2px}
+.flow-list{background:#fff;margin:10px;border-radius:12px;padding:0 14px}
+.flow-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border-light);font-size:12px}
+.flow-item:last-child{border-bottom:none}
+.flow-ico{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.flow-ico.up{background:#f0f9eb;color:var(--success)}
+.flow-ico.down{background:#fef0f0;color:var(--danger)}
+.flow-main{flex:1;min-width:0}
+.flow-main .n{font-size:13px;color:var(--text1)}
+.flow-main .m{font-size:11px;color:var(--text3);margin-top:2px}
+.flow-val{font-weight:700;font-size:14px}
+.flow-val.up{color:var(--success)}
+.flow-val.down{color:var(--danger)}
+/* ===== 列表 tab ===== */
+.tabbar-tabs{display:flex;background:#fff;margin:10px 10px 0;border-radius:10px 10px 0 0;padding:0 6px;border-bottom:1px solid var(--border-light)}
+.tabbar-tabs button{flex:1;padding:10px 0;border:none;background:transparent;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;position:relative}
+.tabbar-tabs button.on{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.tabbar-tabs .cnt{position:absolute;top:4px;right:14px;background:var(--danger);color:#fff;font-size:10px;border-radius:8px;padding:0 4px;min-width:14px}
+.list-card{background:#fff;margin:0 10px 10px;border-radius:0 0 12px 12px;padding:0 14px}
+.list-row{display:flex;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid var(--border-light);cursor:pointer;font-size:13px}
+.list-row:last-child{border-bottom:none}
+.list-row .ic{width:36px;height:36px;border-radius:8px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.list-row .ic svg{width:18px;height:18px}
+.list-row .main{flex:1;min-width:0}
+.list-row .main .n{font-size:13px}
+.list-row .main .m{font-size:11px;color:var(--text3);margin-top:2px}
+.list-row .arr{color:var(--text3);font-size:12px}
+/* ===== 登录 ===== */
+.login-hero{height:200px;background:linear-gradient(135deg,#0081ff,#4da3ff);color:#fff;padding:44px 24px 0}
+.login-hero b{font-size:22px;display:block}
+.login-hero span{font-size:12px;opacity:.92}
+.login-form{background:#fff;margin:0;border-radius:16px 16px 0 0;padding:22px 20px;min-height:320px}
+.login-form .field{border-bottom:1px solid var(--border-light);padding:12px 2px;font-size:14px;color:var(--text2);margin-bottom:8px}
+.login-form .field::before{content:"手机号 / 学号";font-size:12px;color:var(--text3);display:block;margin-bottom:2px}
+.login-form .field.pw::before{content:"密码"}
+.login-form .hint{font-size:11px;color:var(--text3);text-align:center;margin:10px 0 16px}
+.login-form .hint b{color:var(--primary);font-weight:500}
+.wechat-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#07c160;color:#fff;border-radius:22px;padding:12px;font-size:15px;font-weight:600;cursor:pointer}
+.wechat-btn svg{width:20px;height:20px}
+/* ===== 视图切换 ===== */
+.view{display:none}
+.view.on{display:block}
+/* ===== toast & modal ===== */
+.toast{position:fixed;top:16%;left:50%;transform:translateX(-50%);background:rgba(48,49,51,.92);color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.modal-mask{position:absolute;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;z-index:100}
+.modal-mask.show{display:flex}
+.modal{background:#fff;border-radius:14px 14px 0 0;padding:18px 18px 26px;width:100%}
+.modal h3{font-size:16px;font-weight:700;text-align:center;margin-bottom:6px}
+.modal .sub{font-size:12px;color:var(--text3);text-align:center;margin-bottom:14px}
+.modal .warn{display:flex;gap:6px;background:#fef8f0;border:1px solid #f6e2c2;border-radius:10px;padding:10px 12px;font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.7}
+.modal .warn svg{width:15px;height:15px;color:var(--warning);flex-shrink:0;margin-top:1px}
+.modal-foot{display:flex;gap:10px}
+.modal-foot .btn{flex:1;padding:11px}
+/* ===== 页脚说明 ===== */
+.mp-note{width:375px;margin-top:10px;padding:8px 12px;background:#fff;border-radius:8px;font-size:11px;color:var(--text3);line-height:1.8;text-align:center}
+.mp-note b{color:var(--text2)}
+@media (max-width:760px){.stage{flex-direction:column}.stage-side{width:100%;height:auto;position:static;display:flex;flex-wrap:wrap;gap:4px;padding:12px}.stage-side h2,.stage-side .sub,.stage-side h4{display:none}.stage-side a{flex:0 0 auto;font-size:12px;padding:6px 10px}.stage-side a .no{display:none}.stage-main{padding:16px 10px}}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast">演示提示</div>
+
+<div class="stage">
+  <!-- ===== 左侧页面导航 ===== -->
+  <aside class="stage-side">
+    <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg>微信小程序原型</h2>
+    <div class="sub">375 × 667 基准 · tabBar 5 项 · 数据为示例</div>
+    <h4>启动与主导航</h4>
+    <a class="on" id="nav-mp01" onclick="goto('mp01')"><span>登录 / 注册</span><span class="no">P-MP-01</span></a>
+    <a id="nav-mp02" onclick="goto('mp02')"><span>首页（tabBar）</span><span class="no">P-MP-02</span></a>
+    <a id="nav-mp03" onclick="goto('mp03')"><span>寻失物（tabBar）</span><span class="no">P-MP-03</span></a>
+    <a id="nav-mp04" onclick="goto('mp04')"><span>发布信息（tabBar）</span><span class="no">P-MP-04</span></a>
+    <a id="nav-mp05" onclick="goto('mp05')"><span>寻失主（tabBar）</span><span class="no">P-MP-05</span></a>
+    <a id="nav-mp06" onclick="goto('mp06')"><span>个人中心（tabBar）</span><span class="no">P-MP-06</span></a>
+    <h4>内容与业务页</h4>
+    <a id="nav-mp07" onclick="goto('mp07')"><span>失物详情</span><span class="no">P-MP-07</span></a>
+    <a id="nav-mp08" onclick="goto('mp08')"><span>招领详情</span><span class="no">P-MP-08</span></a>
+    <a id="nav-mp09" onclick="goto('mp09')"><span>认领登记</span><span class="no">P-MP-09</span></a>
+    <a id="nav-mp11" onclick="goto('mp11')"><span>我的信用</span><span class="no">P-MP-11</span></a>
+    <a id="nav-mp12" onclick="goto('mp12')"><span>我的认领申请</span><span class="no">P-MP-12</span></a>
+    <a id="nav-mp13" onclick="goto('mp13')"><span>我的发布</span><span class="no">P-MP-13</span></a>
+    <a id="nav-mp14" onclick="goto('mp14')"><span>消息中心</span><span class="no">P-MP-14</span></a>
+    <h4>设置与说明</h4>
+    <a id="nav-mp15" onclick="goto('mp15')"><span>用户资料编辑</span><span class="no">P-MP-15</span></a>
+    <a id="nav-mp16" onclick="goto('mp16')"><span>用户详情</span><span class="no">P-MP-16</span></a>
+    <a id="nav-mp17" onclick="goto('mp17')"><span>帮助与规则</span><span class="no">P-MP-17</span></a>
+    <a id="nav-mp18" onclick="goto('mp18')"><span>关于我们</span><span class="no">P-MP-18</span></a>
+    <a id="nav-mp19" onclick="goto('mp19')"><span>退出登录</span><span class="no">P-MP-19</span></a>
+    <a id="nav-mp20" onclick="goto('mp20')"><span>退出成功</span><span class="no">P-MP-20</span></a>
+  </aside>
+
+  <div class="stage-main">
+    <div class="stage-title">校园失物招领平台 · 微信小程序端界面原型（<b id="curName">登录 / 注册</b>）</div>
+
+    <!-- ===== 视图：登录 / 注册 P-MP-01 ===== -->
+    <section class="view on" id="view-mp01">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body">
+          <div class="login-hero"><b>校园失物招领</b><span>让每一件失物，都有归途</span></div>
+          <div class="login-form">
+            <div class="field">138****5678</div>
+            <div class="field pw">••••••••</div>
+            <div class="hint">未注册的手机号验证通过后将自动注册 · <b>《用户协议》</b>与<b>《隐私政策》</b></div>
+            <button class="btn btn-primary btn-block" style="margin:0 0 12px" onclick="toast('演示：登录成功，进入首页')">登 录</button>
+            <div class="wechat-btn" onclick="toast('演示：微信一键登录')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 7c-3 0-5 2-5 4.5 0 1.5.8 2.8 2 3.6L5.4 17l2.2-1.1c.4.1.9.2 1.4.2"/><path d="M15 7c3 0 5 2 5 4.5 0 3-3 5.5-6.5 5.5h-3L9 19l1-2.3c1.7-.4 3-1.4 3.7-2.7"/></svg>微信一键登录</div>
+          </div>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-01 登录 / 注册</b>（启动页）· 关联 FR-AUTH-01、FR-AUTH-02 · 未注册手机号验证通过自动注册</div>
+    </section>
+
+    <!-- ===== 视图：首页 P-MP-02 ===== -->
+    <section class="view" id="view-mp02">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px">
+            <div class="ttl" style="font-size:15px">校园失物招领</div>
+            <div class="mp-search" onclick="toast('演示：搜索物品名称 / 地点')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>搜索物品名称 / 地点</div>
+            <div class="mp-ico" onclick="toast('演示：消息中心 P-MP-14')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><i class="dot"></i></div>
+          </div>
+          <div class="mp-banner"><b>让每一件失物，都有归途</b><span>信用激励 · 贵重物品安全管控</span></div>
+          <div class="grid4">
+            <div class="g4" onclick="goto('mp03')"><div class="gi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h10M4 18h7"/></svg></div><div class="gn">寻失物</div><div class="gd">丢了东西</div></div>
+            <div class="g4" onclick="goto('mp04')"><div class="gi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></div><div class="gn">发布信息</div><div class="gd">失物 / 招领</div></div>
+            <div class="g4" onclick="goto('mp11')"><div class="gi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg></div><div class="gn">我的信用</div><div class="gd">108 分 L4</div></div>
+            <div class="g4" onclick="toast('演示：信用排行榜（小程序端）')"><div class="gi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z"/></svg></div><div class="gn">排行榜</div><div class="gd">本周 / 总榜</div></div>
+          </div>
+          <div class="sect"><span>最新招领</span><span class="more" onclick="goto('mp05')">更多</span></div>
+          <div class="mp-card" onclick="goto('mp08')">
+            <div class="thumb"><span class="tag t-valuable">贵重</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><circle cx="12" cy="16" r="1"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="t"><span>校园卡（一卡通）</span></div><div class="m">图书馆二楼 · 5 小时前<br>拾获者：李同学 <span class="lv lv-l5" style="font-size:10px">L5</span> · 待审核</div></div>
+          </div>
+          <div class="mp-card" onclick="goto('mp08')">
+            <div class="thumb"><span class="tag t-pub">已发布</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="t"><span>黑色蓝牙耳机（左耳）</span></div><div class="m">三教 305 · 2 小时前<br>拾获者：张同学 <span class="lv lv-l3" style="font-size:10px">L3</span></div></div>
+          </div>
+          <div class="mp-card" onclick="goto('mp08')">
+            <div class="thumb"><span class="tag t-valuable">贵重</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M12 11v4M12 8v.5"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="t"><span>白色 iPhone 15</span></div><div class="m">食堂一楼 · 3 小时前 · 已上报保卫处</div></div>
+          </div>
+        </div>
+        <div class="mp-tabbar">
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a onclick="goto('mp03')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a onclick="goto('mp06')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-02 首页</b>（tabBar）· 关联 FR-COM-01、FR-CREDIT-09 · tabBar 选中色 #87CEFF</div>
+    </section>
+
+    <!-- ===== 视图：寻失物 P-MP-03 ===== -->
+    <section class="view" id="view-mp03">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px">
+            <div class="ttl" style="font-size:15px">寻失物</div>
+            <div class="mp-search" onclick="toast('演示：无结果时展示 ST-03 状态稿')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>搜索失物</div>
+          </div>
+          <div class="tabbar-tabs" style="margin:10px">
+            <button class="on">全部</button><button>电子设备</button><button>证件类</button><button>其他</button>
+          </div>
+          <div class="mp-card" onclick="goto('mp07')">
+            <div class="thumb"><span class="tag t-pub">待认领</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="t"><span>黑色蓝牙耳机（左耳）</span></div><div class="m">三教 305 · 丢失 2026-10-07<br>发布者：张同学 <span class="lv lv-l3" style="font-size:10px">L3</span></div></div>
+          </div>
+          <div class="mp-card" onclick="goto('mp07')">
+            <div class="thumb"><span class="tag t-valuable">贵重</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><circle cx="12" cy="16" r="1"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="t"><span>校园卡（一卡通）</span></div><div class="m">图书馆二楼 · 丢失 2026-10-05<br>发布者：李同学 <span class="lv lv-l5" style="font-size:10px">L5</span> · 已完成</div></div>
+          </div>
+          <div class="mp-card" onclick="goto('mp07')">
+            <div class="thumb"><span class="tag t-pending">审核中</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M12 11v4M12 8v.5"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="t"><span>白色 iPhone 15</span></div><div class="m">食堂一楼 · 丢失 2026-10-08 · 已上报保卫处</div></div>
+          </div>
+          <div class="mp-card" onclick="goto('mp07')">
+            <div class="thumb"><span class="tag t-pub">待认领</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="5" width="12" height="16" rx="2"/><path d="M9 5V4a3 3 0 0 1 6 0v1"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="t"><span>黑色笔记本（活页）</span></div><div class="m">逸夫楼 401 · 丢失 2026-10-06<br>发布者：赵同学 <span class="lv lv-l2" style="font-size:10px">L2</span></div></div>
+          </div>
+          <div class="mp-card" onclick="goto('mp07')">
+            <div class="thumb"><span class="tag t-valuable">贵重</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l3 2"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="t"><span>银色手表</span></div><div class="m">体育器械室 · 丢失 2026-10-04 · 超期公示中</div></div>
+          </div>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a onclick="goto('mp06')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-03 寻失物</b>（tabBar）· 关联 FR-LOST-05、FR-LOST-08 · 含 ST-02 空态、ST-03 无检索结果状态稿</div>
+    </section>
+
+    <!-- ===== 视图：寻失主 P-MP-05 ===== -->
+    <section class="view" id="view-mp05">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px">
+            <div class="ttl" style="font-size:15px">寻失主</div>
+            <div class="mp-search" onclick="toast('演示：搜索招领物品')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>搜索招领物品</div>
+          </div>
+          <div class="tabbar-tabs" style="margin:10px">
+            <button class="on">全部</button><button>待审核</button><button>已发布</button><button>已完成</button>
+          </div>
+          <div class="mp-card" onclick="goto('mp08')">
+            <div class="thumb"><span class="tag t-valuable">贵重</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><circle cx="12" cy="16" r="1"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="t"><span>校园卡（一卡通）</span></div><div class="m">图书馆二楼 · 5 小时前 · 待审核<br>拾获者：李同学 <span class="lv lv-l5" style="font-size:10px">L5</span></div></div>
+          </div>
+          <div class="mp-card" onclick="goto('mp08')">
+            <div class="thumb"><span class="tag t-pub">已发布</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="t"><span>黑色蓝牙耳机（左耳）</span></div><div class="m">三教 305 · 2 小时前<br>拾获者：张同学 <span class="lv lv-l3" style="font-size:10px">L3</span></div></div>
+          </div>
+          <div class="mp-card" onclick="goto('mp08')">
+            <div class="thumb"><span class="tag t-valuable">贵重</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M12 11v4M12 8v.5"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="t"><span>白色 iPhone 15</span></div><div class="m">食堂一楼 · 3 小时前 · 已上报保卫处</div></div>
+          </div>
+          <div class="mp-card" onclick="goto('mp08')">
+            <div class="thumb"><span class="tag t-done">已完成</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="t"><span>灰色双肩背包</span></div><div class="m">操场看台 · 3 天前 · 已交接<br>拾获者：周同学 <span class="lv lv-l2" style="font-size:10px">L2</span></div></div>
+          </div>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a onclick="goto('mp03')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a onclick="goto('mp06')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-05 寻失主</b>（tabBar）· 关联 FR-FOUND-03 · 招领列表 + 状态筛选</div>
+    </section>
+
+    <!-- ===== 视图：发布信息 P-MP-04 ===== -->
+    <section class="view" id="view-mp04">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px">
+            <div class="ttl" style="font-size:15px">发布信息</div>
+            <div style="flex:1"></div>
+            <span style="font-size:11px;color:var(--text3)">发布中…</span>
+          </div>
+          <div class="form-card">
+            <div class="form-row"><label>信息类型</label>
+              <div class="radio-seg">
+                <label><input type="radio" name="mptype"><span>寻失物（我丢了东西）</span></label>
+                <label><input type="radio" name="mptype" checked><span>寻失主（我捡到东西）</span></label>
+              </div>
+            </div>
+            <div class="form-row"><label>物品名称</label><input class="input" value="校园卡（一卡通）" onfocus="toast('示例：3 至 50 字')"></div>
+            <div class="form-row" style="align-items:flex-start"><label>物品描述</label><textarea class="textarea" style="min-height:60px">蓝色卡套，正面贴有白色贴纸，背面有手写姓名缩写（示例数据）</textarea></div>
+            <div class="form-row"><label>物品分类</label><select class="select"><option>证件类</option><option>电子设备类</option></select></div>
+            <div class="form-row"><label>拾获时间</label><input class="input" value="2026-10-08 09:30"></div>
+            <div class="form-row"><label>拾获地点</label><input class="input" value="图书馆二楼大厅"></div>
+            <div class="form-row" style="align-items:flex-start"><label>物品图片</label>
+              <div class="upload-box">
+                <div class="upload-item" style="background:#dceafb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><circle cx="12" cy="16" r="1"/></svg></div>
+                <div class="upload-item" onclick="toast('演示：最多 3 张，单张 ≤ 5 MB')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></div>
+              </div>
+            </div>
+            <div class="form-row"><label>联系方式</label><input class="input" value="138****5678"></div>
+          </div>
+          <label style="display:flex;align-items:center;gap:6px;margin:10px 14px;font-size:12px;color:var(--text2)"><input type="checkbox" checked style="accent-color:var(--primary)"> 标记为贵重物品（由保卫处统一保管与核验）</label>
+          <div class="credit-tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg>已标记贵重物品，发布后将上报保卫处并计入处理台账（FR-SEC-01）</div>
+          <button class="btn btn-primary btn-block" onclick="toast('演示：提交成功（ST-09）')">提交发布</button>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a onclick="goto('mp03')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a onclick="goto('mp06')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-04 发布信息</b>（tabBar）· 关联 FR-LOST-01、FR-FOUND-01 · 字段与校验见 SRS 4.1.5</div>
+    </section>
+
+    <!-- ===== 视图：失物详情 P-MP-07 ===== -->
+    <section class="view" id="view-mp07">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px;background:linear-gradient(135deg,#0081ff,#4da3ff)">
+            <div style="flex:1" class="ttl">失物详情</div>
+            <span style="font-size:12px;color:#fff;opacity:.9">举报</span>
+          </div>
+          <div class="d-img"><span class="tag t-pub">待认领</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg></div>
+          <div class="d-card">
+            <div class="t"><span>黑色蓝牙耳机（左耳）</span><span class="tag t-pub">待认领</span></div>
+            <div class="d-info">
+              丢失时间：2026-10-07 12:40 左右<br>
+              丢失地点：三教 305 教室<br>
+              物品分类：电子设备类<br>
+              描述：黑色蓝牙耳机左耳，白色充电仓，右耳仍在充电仓内<br>
+              发布者：张同学 <span class="lv lv-l3" style="font-size:10px">L3</span><br>
+              联系方式：认领核验通过后展示（脱敏）
+            </div>
+            <div class="credit-tip" style="margin-top:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg>当前信用分 <b>108</b>（L4）· 虚假认领将扣除 20 分</div>
+            <button class="btn btn-primary btn-block" onclick="toast('演示：前往认领登记 P-MP-09')">申请认领</button>
+          </div>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a onclick="goto('mp06')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-07 失物详情</b>· 关联 FR-LOST-06 · 认领前信用提示（FR-CREDIT-10）</div>
+    </section>
+
+    <!-- ===== 视图：招领详情 P-MP-08 ===== -->
+    <section class="view" id="view-mp08">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px;background:linear-gradient(135deg,#0081ff,#4da3ff)">
+            <div style="flex:1" class="ttl">招领详情</div>
+            <span style="font-size:12px;color:#fff;opacity:.9">举报</span>
+          </div>
+          <div class="d-img"><span class="tag t-valuable">贵重物品</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="7" y="3" width="10" height="18" rx="2"/><circle cx="12" cy="16" r="1"/></svg></div>
+          <div class="d-card">
+            <div class="t"><span>校园卡（一卡通）</span><span class="tag t-valuable">贵重物品</span><span class="tag t-pending">待审核</span></div>
+            <div class="d-info">
+              拾获地点：图书馆二楼大厅<br>
+              拾获时间：2026-10-08 09:30<br>
+              拾获者：李同学 <span class="lv lv-l5" style="font-size:10px">L5 诚信模范</span><br>
+              描述：蓝色卡套，正面贴有白色贴纸，背面有手写姓名缩写<br>
+              保管方式：<b>贵重物品 · 保卫处统一保管（3 号柜 A-12）</b>
+            </div>
+            <div class="credit-tip" style="margin-top:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg>认领需提交身份证明与购买凭证 · 拾获者将获 +10 信用分（FR-SEC-07）</div>
+            <button class="btn btn-primary btn-block" onclick="goto('mp09')">申请认领</button>
+            <div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0 2px">处理状态：待上报 → 待审核 → 保管中 → 待核验 → 待交接 → 已交接（示例）</div>
+          </div>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a onclick="goto('mp03')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a onclick="goto('mp06')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-08 招领详情</b>· 关联 FR-FOUND-04、FR-FOUND-05、FR-SEC-07</div>
+    </section>
+
+    <!-- ===== 视图：认领登记 P-MP-09 ===== -->
+    <section class="view" id="view-mp09">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px"><div class="ttl" style="font-size:15px">认领登记</div></div>
+          <div class="mp-card" style="margin-top:10px">
+            <div class="thumb"><span class="tag t-valuable">贵重</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><circle cx="12" cy="16" r="1"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="t"><span>校园卡（一卡通）</span></div><div class="m">目标物品由来源页面带入 · 不可修改</div></div>
+          </div>
+          <div class="credit-tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg>当前信用分 <b>108</b>（L4 优秀）· 认领优先级高 · 虚假认领将扣除 20 分</div>
+          <div class="form-card">
+            <div class="form-row"><label>认领人姓名</label><input class="input" value="徐晓阳"></div>
+            <div class="form-row"><label>学号</label><input class="input" value="55230217"></div>
+            <div class="form-row"><label>联系方式</label><input class="input" value="138****5678"></div>
+            <div class="form-row" style="align-items:flex-start"><label>物品特征</label><textarea class="textarea" style="min-height:54px">蓝色卡套，正面贴有白色贴纸，背面有手写姓名缩写（示例）</textarea></div>
+            <div class="form-row"><label>交接意向</label><input class="input" value="保卫处现场交接"></div>
+            <div class="form-row" style="align-items:flex-start"><label>证明材料</label>
+              <div class="upload-box">
+                <div class="upload-item" style="background:#dceafb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 8h6M9 12h6"/></svg></div>
+                <div class="upload-item" style="background:#dceafb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 8h6M9 12h6"/></svg></div>
+                <div class="upload-item" onclick="toast('演示：贵重物品必传身份证明与购买凭证（1 至 3 张）')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></div>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--text3);padding:0 14px;line-height:1.7">贵重物品认领需提交身份证明与购买凭证，经保卫处核验后线下交接（BR-SEC-04）</div>
+          <button class="btn btn-primary btn-block" onclick="openModal('modalConfirm')">提交认领申请</button>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a onclick="goto('mp06')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+        <div class="modal-mask" id="modalConfirm">
+          <div class="modal">
+            <h3>确认提交认领申请？</h3>
+            <div class="sub">提交后不可撤销，请确保信息真实</div>
+            <div class="warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg>若被判定为虚假认领，将扣除 20 信用分（恶意认领扣 50 分并冻结），该后果不可回退</div>
+            <div class="modal-foot">
+              <button class="btn btn-line" onclick="closeModal('modalConfirm')">取消</button>
+              <button class="btn btn-primary" onclick="closeModal('modalConfirm');toast('演示：认领申请已提交，等待保卫处核验')">确认提交</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-09 认领登记</b>· 关联 FR-CLAIM-02、FR-CREDIT-10 · P-MP-10 已合并至此 · 危险操作二次确认（ST-10）</div>
+    </section>
+
+    <!-- ===== 视图：我的信用 P-MP-11 ===== -->
+    <section class="view" id="view-mp11">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px"><div class="ttl" style="font-size:15px">我的信用</div></div>
+          <div class="credit-hero">
+            <div class="row"><span class="score">108</span><span class="lv lv-l4">L4 优秀</span></div>
+            <div class="meta">认领优先级：高 · 每日发布上限：10 条 · 距离 L5 诚信模范还差 12 分</div>
+            <div class="credit-bar"><i style="width:72%"></i></div>
+          </div>
+          <div class="stat3">
+            <div class="st"><div class="n" style="color:var(--success)">+9</div><div class="l">本月加分</div></div>
+            <div class="st"><div class="n" style="color:var(--danger)">-15</div><div class="l">本月扣分</div></div>
+            <div class="st"><div class="n" style="color:var(--primary)">5</div><div class="l">归还次数</div></div>
+          </div>
+          <div class="flow-list">
+            <div class="flow-item"><div class="flow-ico up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="width:15px;height:15px"><path d="M4 12l5 5L20 6"/></svg></div><div class="flow-main"><div class="n">归还普通物品</div><div class="m">10-07 14:20</div></div><div class="flow-val up">+5</div></div>
+            <div class="flow-item"><div class="flow-ico up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="width:15px;height:15px"><path d="M4 12l5 5L20 6"/></svg></div><div class="flow-main"><div class="n">按约完成认领</div><div class="m">10-06 10:05</div></div><div class="flow-val up">+2</div></div>
+            <div class="flow-item"><div class="flow-ico up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="width:15px;height:15px"><path d="M4 12l5 5L20 6"/></svg></div><div class="flow-main"><div class="n">连续无违规（30 天）</div><div class="m">10-01 00:00</div></div><div class="flow-val up">+2</div></div>
+            <div class="flow-item"><div class="flow-ico down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="width:15px;height:15px"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg></div><div class="flow-main"><div class="n">逾期未交接</div><div class="m">09-28 18:00</div></div><div class="flow-val down">-10</div></div>
+            <div class="flow-item"><div class="flow-ico down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="width:15px;height:15px"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg></div><div class="flow-main"><div class="n">发布虚假信息 <span class="tag t-pending">申诉中</span></div><div class="m">09-20 09:12 · 可申诉</div></div><div class="flow-val down">-5</div></div>
+          </div>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a onclick="goto('mp03')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-11 我的信用</b>（新增）· 关联 FR-CREDIT-02、FR-CREDIT-10 · 扣分记录提供申诉入口</div>
+    </section>
+
+    <!-- ===== 视图：我的认领申请 P-MP-12 ===== -->
+    <section class="view" id="view-mp12">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px"><div class="ttl" style="font-size:15px">我的认领申请</div></div>
+          <div class="tabbar-tabs" style="margin:10px">
+            <button class="on">全部</button><button>处理中<span class="cnt">2</span></button><button>已完成</button><button>已驳回</button>
+          </div>
+          <div class="list-card" style="padding:0 10px">
+            <div class="mp-card" style="margin:8px 0">
+              <div class="thumb"><span class="tag t-pending">待核验</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><circle cx="12" cy="16" r="1"/></svg></div>
+              <div style="flex:1;min-width:0"><div class="t"><span>校园卡（一卡通）</span></div><div class="m">认领申请已提交 · 保卫处核验凭证中<br>2026-10-08 10:20 提交</div></div>
+            </div>
+            <div class="mp-card" style="margin:8px 0">
+              <div class="thumb"><span class="tag t-queue">排队中</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg></div>
+              <div style="flex:1;min-width:0"><div class="t"><span>黑色蓝牙耳机（左耳）</span></div><div class="m">当前排位第 1 · 依据信用等级 L4 优先<br>2026-10-07 15:00 提交</div></div>
+            </div>
+            <div class="mp-card" style="margin:8px 0">
+              <div class="thumb"><span class="tag t-done">已完成</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+              <div style="flex:1;min-width:0"><div class="t"><span>灰色双肩背包</span></div><div class="m">已交接完成 · 拾获者已确认归还<br>2026-10-05 完成</div></div>
+            </div>
+            <div class="mp-card" style="margin:8px 0">
+              <div class="thumb"><span class="tag t-rej">已撤回</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="5" width="12" height="16" rx="2"/><path d="M9 5V4a3 3 0 0 1 6 0v1"/></svg></div>
+              <div style="flex:1;min-width:0"><div class="t"><span>黑色笔记本（活页）</span></div><div class="m">本人撤回申请，不扣分<br>2026-10-03 撤回</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a onclick="goto('mp03')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-12 我的认领申请</b>（新增）· 关联 FR-CLAIM-05 · 展示认领状态与排位依据</div>
+    </section>
+
+    <!-- ===== 视图：个人中心 P-MP-06 ===== -->
+    <section class="view" id="view-mp06">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px"><div class="ttl" style="font-size:15px">个人中心</div></div>
+          <div style="display:flex;align-items:center;gap:12px;background:#fff;margin:10px;border-radius:12px;padding:14px">
+            <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0081ff,#4da3ff);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0">徐</div>
+            <div style="flex:1"><div style="font-size:16px;font-weight:700">徐晓阳</div><div style="font-size:11px;color:var(--text3);margin-top:2px">学号 55230217 · <span class="lv lv-l4" style="font-size:10px">L4 优秀</span> 108 分</div></div>
+            <span style="font-size:12px;color:var(--text3)" onclick="goto('mp15')">编辑 ›</span>
+          </div>
+          <div class="list-card">
+            <div class="list-row" onclick="goto('mp11')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg></div><div class="main"><div class="n">我的信用</div><div class="m">信用分、等级、流水与申诉</div></div><span class="arr">›</span></div>
+            <div class="list-row" onclick="goto('mp12')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12l5 5L20 6"/></svg></div><div class="main"><div class="n">我的认领申请</div><div class="m">查看认领进度与排位</div></div><span class="arr">›</span></div>
+            <div class="list-row" onclick="goto('mp13')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h10M4 18h7"/></svg></div><div class="main"><div class="n">我的发布</div><div class="m">我发布的失物 / 招领信息</div></div><span class="arr">›</span></div>
+            <div class="list-row" onclick="goto('mp14')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><div class="main"><div class="n">消息中心</div><div class="m">认领、审核与信用变动通知</div></div><span class="arr">›</span></div>
+          </div>
+          <div class="list-card">
+            <div class="list-row" onclick="goto('mp17')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></svg></div><div class="main"><div class="n">帮助与规则</div><div class="m">常见问题与信用规则</div></div><span class="arr">›</span></div>
+            <div class="list-row" onclick="goto('mp16')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></div><div class="main"><div class="n">用户详情</div><div class="m">公开资料展示</div></div><span class="arr">›</span></div>
+            <div class="list-row" onclick="goto('mp18')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 6v6l4 2"/></svg></div><div class="main"><div class="n">关于我们</div><div class="m">平台介绍与版本</div></div><span class="arr">›</span></div>
+          </div>
+          <button class="btn btn-line btn-block" style="margin:4px 10px 16px;width:calc(100% - 20px)" onclick="goto('mp19')">退出登录</button>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a onclick="goto('mp03')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-06 个人中心</b>（tabBar）· 关联 FR-AUTH-09、FR-CREDIT-02 · 菜单入口齐全</div>
+    </section>
+
+    <!-- ===== 视图：我的发布 P-MP-13 ===== -->
+    <section class="view" id="view-mp13">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px"><div class="ttl" style="font-size:15px">我的发布</div></div>
+          <div class="tabbar-tabs" style="margin:10px"><button class="on">全部</button><button>寻失物</button><button>寻失主</button></div>
+          <div class="list-card" style="padding:0 10px">
+            <div class="mp-card" style="margin:8px 0" onclick="goto('mp07')">
+              <div class="thumb"><span class="tag t-pending">审核中</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M12 11v4M12 8v.5"/></svg></div>
+              <div style="flex:1;min-width:0"><div class="t"><span>白色 iPhone 15</span></div><div class="m">丢失 · 2026-10-08 08:10 提交<br>预计 24 小时内完成审核</div></div>
+            </div>
+            <div class="mp-card" style="margin:8px 0" onclick="goto('mp08')">
+              <div class="thumb"><span class="tag t-valuable">贵重</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><circle cx="12" cy="16" r="1"/></svg></div>
+              <div style="flex:1;min-width:0"><div class="t"><span>校园卡（一卡通）</span></div><div class="m">招领 · 2026-10-08 09:35 · 待审核<br>贵重物品已上报保卫处</div></div>
+            </div>
+            <div class="mp-card" style="margin:8px 0" onclick="goto('mp07')">
+              <div class="thumb"><span class="tag t-done">已完成</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+              <div style="flex:1;min-width:0"><div class="t"><span>灰色双肩背包</span></div><div class="m">失物 · 2026-10-05 已找回<br>归还确认，信用 +5</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a onclick="goto('mp03')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-13 我的发布</b>（新增）· 关联 FR-LOST-11、FR-FOUND-08</div>
+    </section>
+
+    <!-- ===== 视图：消息中心 P-MP-14 ===== -->
+    <section class="view" id="view-mp14">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px"><div class="ttl" style="font-size:15px">消息中心</div></div>
+          <div class="tabbar-tabs" style="margin:10px"><button class="on">全部</button><button>认领</button><button>审核</button><button>信用</button></div>
+          <div class="list-card">
+            <div class="list-row" onclick="toast('演示：查看消息详情')">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12l5 5L20 6"/></svg></div>
+              <div class="main"><div class="n">认领申请已通过核验 <span class="tag t-done">新</span></div><div class="m">校园卡（一卡通）凭证核验通过，请前往保卫处交接</div></div>
+              <span style="font-size:11px;color:var(--text3)">10-08</span>
+            </div>
+            <div class="list-row" onclick="toast('演示：查看消息详情')">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h10M4 18h7"/></svg></div>
+              <div class="main"><div class="n">发布信息已通过审核 <span class="tag t-done">新</span></div><div class="m">您发布的招领信息已发布，贵重物品将转入保卫处保管</div></div>
+              <span style="font-size:11px;color:var(--text3)">10-07</span>
+            </div>
+            <div class="list-row" onclick="toast('演示：查看消息详情')">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg></div>
+              <div class="main"><div class="n">信用分变动提醒</div><div class="m">归还普通物品 +5 分，当前 108 分（L4 优秀）</div></div>
+              <span style="font-size:11px;color:var(--text3)">10-07</span>
+            </div>
+            <div class="list-row" onclick="toast('演示：查看消息详情')">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg></div>
+              <div class="main"><div class="n">申诉处理结果</div><div class="m">您对“发布虚假信息”扣分的申诉已受理，处理中</div></div>
+              <span style="font-size:11px;color:var(--text3)">10-05</span>
+            </div>
+          </div>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a onclick="goto('mp03')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-14 消息中心</b>（新增）· 关联 FR-NOTIFY-01 · 认领 / 审核 / 信用通知分类</div>
+    </section>
+
+    <!-- ===== 视图：用户资料编辑 P-MP-15 ===== -->
+    <section class="view" id="view-mp15">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px"><div class="ttl" style="font-size:15px">用户资料编辑</div></div>
+          <div style="display:flex;align-items:center;gap:12px;background:#fff;margin:10px;border-radius:12px;padding:14px">
+            <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#0081ff,#4da3ff);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex-shrink:0">徐</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600">修改头像</div><div style="font-size:11px;color:var(--text3);margin-top:2px">基线问题已修复：支持从相册选择并上传（P-MP-15 整改项）</div></div>
+            <span style="font-size:14px;color:var(--primary)" onclick="toast('演示：选择头像上传')">更换</span>
+          </div>
+          <div class="form-card">
+            <div class="form-row"><label>昵称</label><input class="input" value="徐晓阳"></div>
+            <div class="form-row"><label>学号</label><input class="input" value="55230217"></div>
+            <div class="form-row"><label>联系方式</label><input class="input" value="138****5678"></div>
+            <div class="form-row"><label>个性签名</label><input class="input" value="诚信招领，物归原主"></div>
+          </div>
+          <button class="btn btn-primary btn-block" onclick="toast('演示：保存成功，返回个人中心')">保存</button>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a onclick="goto('mp03')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-15 用户资料编辑</b>· 改造（修复头像上传）· 关联 FR-AUTH-09</div>
+    </section>
+
+    <!-- ===== 视图：用户详情 P-MP-16 ===== -->
+    <section class="view" id="view-mp16">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px"><div class="ttl" style="font-size:15px">用户详情</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;background:#fff;margin:10px;border-radius:12px;padding:22px 14px">
+            <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#0081ff,#4da3ff);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700">徐</div>
+            <div style="font-size:17px;font-weight:700;margin-top:10px">徐晓阳</div>
+            <div style="display:flex;gap:6px;margin-top:6px;align-items:center"><span class="lv lv-l4">L4 优秀</span><span style="font-size:12px;color:var(--text3)">信用分 108 · 归还 5 次</span></div>
+          </div>
+          <div class="form-card">
+            <div class="form-row"><label>学号</label><div style="flex:1;text-align:right;font-size:13px">55230217</div></div>
+            <div class="form-row"><label>认证状态</label><div style="flex:1;text-align:right;font-size:13px;color:var(--success)">已认证（学生）</div></div>
+            <div class="form-row"><label>加入时间</label><div style="flex:1;text-align:right;font-size:13px">2024-09-01</div></div>
+          </div>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a onclick="goto('mp03')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-16 用户详情</b>· 改造 · 关联 FR-AUTH-09 · 联系方式脱敏展示</div>
+    </section>
+
+    <!-- ===== 视图：帮助与规则 P-MP-17 ===== -->
+    <section class="view" id="view-mp17">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body scroll">
+          <div class="mp-head" style="padding-top:8px"><div class="ttl" style="font-size:15px">帮助与规则</div></div>
+          <div class="list-card">
+            <div class="list-row" onclick="toast('演示：展开 / 收起（手风琴）')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h10M4 18h7"/></svg></div><div class="main"><div class="n">如何发布失物 / 招领信息？</div><div class="m">点击底部“发布”，选择信息类型并填写表单，提交后 24 小时内完成审核</div></div><span class="arr">›</span></div>
+            <div class="list-row" onclick="toast('演示：展开 / 收起（手风琴）')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12l5 5L20 6"/></svg></div><div class="main"><div class="n">认领物品需要什么凭证？</div><div class="m">普通物品凭特征描述核验；贵重物品需身份证明与购买凭证，经保卫处核验后线下交接</div></div><span class="arr">›</span></div>
+            <div class="list-row" onclick="toast('演示：展开 / 收起（手风琴）')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg></div><div class="main"><div class="n">信用分如何加分与扣分？</div><div class="m">初始 100 分；归还普通物品 +5、贵重 +10，按约认领 +2；虚假认领 -20，恶意 -50 并冻结</div></div><span class="arr">›</span></div>
+            <div class="list-row" onclick="toast('演示：展开 / 收起（手风琴）')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg></div><div class="main"><div class="n">什么是贵重物品？</div><div class="m">手机、电脑、证件、现金、首饰等，由保卫处统一保管与核验，全程留痕可追溯</div></div><span class="arr">›</span></div>
+          </div>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a onclick="goto('mp03')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-17 帮助与规则</b>（新增）· 关联 FR-COM-03 · FAQ 手风琴 + 信用规则说明</div>
+    </section>
+
+    <!-- ===== 视图：关于我们 P-MP-18 ===== -->
+    <section class="view" id="view-mp18">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body">
+          <div class="mp-head" style="padding-top:8px"><div class="ttl" style="font-size:15px">关于我们</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;padding:44px 24px 10px">
+            <div style="width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#0081ff,#4da3ff);display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="40" height="40" fill="none"><rect width="24" height="24" rx="5" fill="none"/><path d="M12 6a4 4 0 0 0-4 4v2H7v6h10v-6h-1v-2a4 4 0 0 0-4-4zm-2 4a2 2 0 1 1 4 0v2h-4v-2z" fill="#fff"/></svg></div>
+            <div style="font-size:18px;font-weight:700;margin-top:14px">校园失物招领平台</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px">WarmSearch 二次开发 · 版本 V2.0.0</div>
+            <div style="font-size:12px;color:var(--text2);text-align:center;line-height:2;margin-top:16px">基于开源项目 WarmSearch 二次开发<br>信用激励 · 贵重物品安全管控<br>T5 项目组 · RUP 统一过程</div>
+          </div>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a onclick="goto('mp03')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-18 关于我们</b>· 改造 · 关联 FR-COM-04 · 替换废弃的捐赠页</div>
+    </section>
+
+    <!-- ===== 视图：退出登录 P-MP-19 ===== -->
+    <section class="view" id="view-mp19">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body">
+          <div class="mp-head" style="padding-top:8px"><div class="ttl" style="font-size:15px">退出登录</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;padding:60px 30px 20px;text-align:center">
+            <div style="width:64px;height:64px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--text3)"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></div>
+            <div style="font-size:16px;font-weight:600;margin-top:16px">确定要退出登录吗？</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:6px">退出后需要重新登录才能使用发布与认领功能</div>
+          </div>
+          <div style="padding:0 20px;display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-primary" onclick="openModal('modalSignout')">退出登录</button>
+            <button class="btn btn-line" onclick="goto('mp06')">取消</button>
+          </div>
+        </div>
+        <div class="mp-tabbar">
+          <a onclick="goto('mp02')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>首页</a>
+          <a onclick="goto('mp03')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>寻失物</a>
+          <a onclick="goto('mp04')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>发布</a>
+          <a onclick="goto('mp05')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4h-2L6 22l1.4-3.6A8.5 8.5 0 1 1 21 11.5z"/></svg>寻失主</a>
+          <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>我的</a>
+        </div>
+        <div class="modal-mask" id="modalSignout">
+          <div class="modal">
+            <h3>确认退出登录？</h3>
+            <div class="sub">退出后需重新登录</div>
+            <div class="warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg>退出后，未登录状态下将无法发布信息、申请认领（ST-05 未登录拦截），请确认</div>
+            <div class="modal-foot">
+              <button class="btn btn-line" onclick="closeModal('modalSignout')">取消</button>
+              <button class="btn btn-primary" onclick="closeModal('modalSignout');goto('mp20')">确认退出</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-19 退出登录</b>· 改造（补二次确认）· 关联 FR-AUTH-04 · 危险操作确认 ST-10</div>
+    </section>
+
+    <!-- ===== 视图：退出成功 P-MP-20 ===== -->
+    <section class="view" id="view-mp20">
+      <div class="mp-frame">
+        <div class="mp-status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="mp-body">
+          <div style="display:flex;flex-direction:column;align-items:center;padding:80px 30px 24px;text-align:center">
+            <div style="width:72px;height:72px;border-radius:50%;background:#f0f9eb;display:flex;align-items:center;justify-content:center;color:var(--success)"><svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12l5 5L20 6"/></svg></div>
+            <div style="font-size:18px;font-weight:700;margin-top:16px">已退出登录</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:8px">期待您的再次使用</div>
+          </div>
+          <div style="padding:0 20px">
+            <button class="btn btn-primary btn-block" style="margin:0 0 12px" onclick="goto('mp01')">重新登录</button>
+          </div>
+        </div>
+      </div>
+      <div class="mp-note"><b>P-MP-20 退出成功</b>· 改造 · 关联 FR-AUTH-04 · 重新登录回到启动页</div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toast._h);toast._h=setTimeout(function(){t.classList.remove('show')},1800);
+}
+var names={'mp01':'登录 / 注册','mp02':'首页','mp03':'寻失物','mp04':'发布信息','mp05':'寻失主','mp06':'个人中心','mp07':'失物详情','mp08':'招领详情','mp09':'认领登记','mp11':'我的信用','mp12':'我的认领申请','mp13':'我的发布','mp14':'消息中心','mp15':'用户资料编辑','mp16':'用户详情','mp17':'帮助与规则','mp18':'关于我们','mp19':'退出登录','mp20':'退出成功'};
+var order=['mp01','mp02','mp03','mp04','mp05','mp06','mp07','mp08','mp09','mp11','mp12','mp13','mp14','mp15','mp16','mp17','mp18','mp19','mp20'];
+function applyRoute(){
+  var h=location.hash.replace('#','')||'mp01';
+  if(!names[h])h='mp01';
+  for(var i=0;i<order.length;i++){
+    var k=order[i];
+    document.getElementById('view-'+k).classList.toggle('on',k===h);
+    document.getElementById('nav-'+k).classList.toggle('on',k===h);
+  }
+  document.getElementById('curName').textContent=names[h];
+}
+function goto(h){location.hash=h;applyRoute();}
+function openModal(id){document.getElementById(id).classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+window.addEventListener('hashchange',applyRoute);
+applyRoute();
+</script>
+</body>
+</html>
