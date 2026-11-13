@@ -1,0 +1,16 @@
+# 基线文件清单 WS_BL-2
+# 生成时间 2026-11-13
+# 字段: SHA256 | 字节数 | 相对路径
+# 细化阶段基线，含需求、界面原型与管理口径
+12ba040836aae5945e604cbbd3ecfc67431a711f129f0463348c5543b359a8d6 | 37679 | 报告模板\CR变更请求单模板.docx
+7e9bd9554d70e4e590046c59e4551fe588a2a1863a21181c97423a0147b3bb9e | 38285 | 报告模板\配置审计检查清单.docx
+bb51739c1e6ec0900c3af1ac550bdfc1b03d7acf7019edcfd4bf431772c770f6 | 37971 | 报告模板\缺陷统计报告模板.docx
+b1bf5828b8c0f9f492e71551c26f5b4990e59ed0f59d86b522e150505d5cc735 | 37854 | 报告模板\周配置状态报告模板.docx
+630a8ec8c0c60c2d8d5fa3a9a9a19a0ec0c6096eb1abd41037cef67050a709c1 | 242829 | 界面说明.pdf
+13e46370dcf50de5343ec7190f9cf29df969f32a0aec426114af32d49fdb1866 | 145003 | 配置管理计划.docx
+1983b6f97284d2e786da3ecf44de8d4f1d21a2a5e1d098dd4c6a87ad657d3ee8 | 11971 | 配置管理检查表_CM-01~CM-52.xlsx
+81a567f158439b5f31f77591fedec0f56a61a1899de48d927683dbac8493b265 | 2134101 | 软件需求规格说明书.docx
+cf51bccc87b7b1e8201d815a8fea01d5ec530b9cc3017cd2befbbfa827a64adf | 102887 | 校园失物招领平台-PC前台完整界面原型(1).html
+b6e40ed49887f97007f22bb015cf6645fa794f0a2068462e9c353c95ba8782fa | 115976 | 校园失物招领平台-后台管理端界面原型.html
+25b0258653dcedfb94eefb415c342cf2c328637b3befcd0d94aec56ee0fbb089 | 86107 | 校园失物招领平台-微信小程序界面原型(1).html
+# 文件数: 11

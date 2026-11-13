@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>校园失物招领平台 后台管理端界面原型</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230081ff'/%3E%3Cpath d='M12 4l2.2 5.6L20 12l-5.8 2.4L12 20l-2.2-5.6L4 12l5.8-2.4z' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+:root{
+  --primary:#0081ff; --primary-dark:#006fe0; --primary-light:#e6f3ff;
+  --success:#67C23A; --warning:#E6A23C; --danger:#F56C6C; --info:#909399;
+  --l1:#909399; --l2:#409EFF; --l3:#67C23A; --l4:#E6A23C; --l5:#D4A017;
+  --bg:#f5f7fa; --card:#fff; --text:#303133; --text2:#606266; --text3:#909399;
+  --border:#e4e7ed; --border-light:#ebeef5; --radius:8px;
+  --shadow:0 2px 12px rgba(0,0,0,.08);
+  --side-dark:#2c3a4d; --side-sec:#22303f;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;background:#e8ecf2;color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+svg{display:inline-block;vertical-align:middle}
+
+/* ===== 舞台布局：左侧页面导航 + 右侧页面 ===== */
+.stage{display:flex;align-items:flex-start;min-height:100vh}
+.stage-side{width:236px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);padding:12px 10px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.stage-title{font-size:14px;font-weight:700;color:var(--primary);padding:8px 10px 10px;border-bottom:1px solid var(--border-light);margin-bottom:6px}
+.stage-grp{font-size:12px;color:var(--text3);padding:10px 10px 6px;font-weight:600}
+.stage-side a{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;color:var(--text2);font-size:13px;margin-bottom:2px}
+.stage-side a .no{font-size:11px;color:var(--text3);width:48px;flex-shrink:0;font-family:Consolas,monospace}
+.stage-side a:hover{background:var(--bg)}
+.stage-side a.on{background:var(--primary-light);color:var(--primary);font-weight:600}
+.stage-side a.on .no{color:var(--primary)}
+.stage-main{flex:1;padding:18px 22px;overflow-x:auto}
+.view{display:none}
+.view.on{display:block}
+
+/* ===== 后台容器 ===== */
+.adm-wrap{display:flex;background:#fff;border:1px solid var(--border-light);border-radius:10px;overflow:hidden;min-height:640px;box-shadow:var(--shadow)}
+.adm-side{width:196px;background:var(--side-dark);color:#c9d4e3;flex-shrink:0;transition:width .2s;position:relative;display:flex;flex-direction:column}
+.adm-side.sec{background:var(--side-sec)}
+.adm-side .logo{display:flex;align-items:center;gap:8px;padding:16px 14px;color:#fff;font-weight:700;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap}
+.adm-side .logo svg{width:20px;height:20px;flex-shrink:0}
+.adm-side nav{flex:1;padding:8px 0;overflow:hidden}
+.adm-side nav a{display:flex;align-items:center;gap:8px;padding:11px 14px;font-size:13px;color:#b8c4d4;border-left:3px solid transparent;white-space:nowrap;transition:.15s}
+.adm-side nav a:hover{color:#fff;background:rgba(255,255,255,.04)}
+.adm-side nav a.on{background:rgba(255,255,255,.08);color:#fff;border-left-color:var(--primary)}
+.adm-side nav a svg{width:15px;height:15px;flex-shrink:0}
+.adm-side.collapsed{width:56px}
+.adm-side.collapsed .logo span,.adm-side.collapsed nav a span{display:none}
+.adm-side .fold{position:absolute;right:-12px;top:18px;width:24px;height:24px;border-radius:50%;background:#fff;border:1px solid var(--border);color:var(--text3);font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.12);z-index:5}
+.adm-body{flex:1;background:var(--bg);padding:16px 18px;overflow:hidden}
+.adm-body h3{font-size:15px;margin-bottom:4px}
+.adm-body .sub{font-size:12px;color:var(--text3);margin-bottom:14px}
+.role-chip{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:600;background:#ecf5ff;color:var(--primary);margin-left:8px}
+
+/* ===== 通用 ===== */
+.card{background:var(--card);border:1px solid var(--border-light);border-radius:var(--radius);box-shadow:var(--shadow)}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;line-height:1.6;white-space:nowrap}
+.t-pending{background:#fdf6ec;color:#e6a23c}.t-pub{background:#ecf5ff;color:#409eff}.t-done{background:#f0f9eb;color:#67c23a}.t-rej{background:#f4f4f5;color:#909399}
+.t-valuable{background:#fde2e2;color:#f56c6c}.t-verify{background:#fdf6ec;color:#e6a23c}.t-queue{background:#ecf5ff;color:#409eff}
+.t-ovr{background:#fef0f0;color:#f56c6c;font-weight:600}
+.lv{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:700;color:#fff}
+.lv-l1{background:var(--l1)}.lv-l2{background:var(--l2)}.lv-l3{background:var(--l3)}.lv-l4{background:var(--l4)}.lv-l5{background:var(--l5)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:500;transition:.15s}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}
+.btn-ghost{border:1px solid #dcdfe6;color:var(--text2);background:#fff}.btn-ghost:hover{color:var(--primary);border-color:var(--primary)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-block{width:100%}
+.thumb{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#dceafb,#eef6ff);border:1px solid var(--border-light);color:#8fc2f0}
+.thumb svg{width:20px;height:20px}
+.muted{color:var(--text3)}
+.stat-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px}
+.stat-cards.c4{grid-template-columns:repeat(4,1fr)}
+.stat{background:#fff;border:1px solid var(--border-light);border-radius:8px;padding:13px 14px;cursor:pointer;transition:.15s}
+.stat:hover{box-shadow:var(--shadow)}
+.stat .num{font-size:24px;font-weight:800;margin-top:2px}
+.stat .lbl{font-size:12px;color:var(--text3)}
+.stat.alert{border-color:#fde2e2;background:#fff8f8}
+.stat.alert .num{color:var(--danger)}
+.stat .delta{font-size:11px;color:var(--success);font-weight:600}
+.table{width:100%;border-collapse:collapse;background:#fff;font-size:13px;table-layout:fixed}
+.table th{background:#f5f7fa;color:var(--text2);text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap}
+.table td{padding:10px 12px;border-bottom:1px solid var(--border-light);vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.table tr:hover td{background:#fafbfc}
+.table .thumb{width:40px;height:40px;border-radius:6px}
+.filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid var(--border-light);border-radius:8px;padding:10px 12px;margin-bottom:12px}
+.filter-bar .seg{display:flex;background:var(--bg);border-radius:6px;padding:2px;gap:2px}
+.filter-bar .seg button{padding:5px 12px;border-radius:5px;font-size:12px;color:var(--text2)}
+.filter-bar .seg button.on{background:#fff;color:var(--primary);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.filter-bar .grow{flex:1}
+.input,.select{width:100%;border:1px solid #dcdfe6;border-radius:6px;padding:8px 12px;font-size:13px;color:var(--text);background:#fff;font-family:inherit}
+.input:focus,.select:focus{outline:none;border-color:var(--primary)}
+.form-row{margin-bottom:14px}
+.form-row label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px}
+.form-row label .req{color:var(--danger)}
+.tabbar-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border-light);margin-bottom:12px}
+.tabbar-tabs button{padding:9px 16px;font-size:13px;color:var(--text2);border-bottom:2px solid transparent;position:relative}
+.tabbar-tabs button.on{color:var(--primary);font-weight:600;border-bottom-color:var(--primary)}
+.tabbar-tabs .cnt{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:9px;background:var(--danger);color:#fff;font-size:11px;margin-left:5px;padding:0 5px}
+.timeline{position:relative;padding-left:22px}
+.timeline:before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:var(--border-light)}
+.tl-item{position:relative;padding-bottom:16px}
+.tl-item:last-child{padding-bottom:0}
+.tl-item:before{content:"";position:absolute;left:-22px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--primary);border:2px solid #fff;box-shadow:0 0 0 2px var(--primary-light)}
+.tl-item.done:before{background:var(--success);box-shadow:0 0 0 2px #f0f9eb}
+.tl-item .t{font-size:13px;font-weight:600}
+.tl-item .m{font-size:12px;color:var(--text3);margin-top:2px}
+.tl-item .who{font-size:12px;color:var(--primary);margin-top:1px}
+.check{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);cursor:pointer}
+.check input{accent-color:var(--primary);width:15px;height:15px}
+.credit-tip{display:flex;align-items:center;gap:8px;background:#fdf6ec;border:1px solid #fbe7c6;border-radius:6px;padding:10px 12px;font-size:12px;color:#8a5a00;margin-bottom:14px}
+.credit-tip svg{width:18px;height:18px;flex-shrink:0}
+
+/* ===== 登录页 ===== */
+.login-wrap{min-height:640px;background:linear-gradient(135deg,#0f2c4d 0%,#14507f 55%,#0081ff 130%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.login-wrap:before{content:"";position:absolute;right:-120px;top:-120px;width:360px;height:360px;border-radius:50%;background:rgba(255,255,255,.06)}
+.login-wrap:after{content:"";position:absolute;left:-80px;bottom:-140px;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,.05)}
+.login-card{width:400px;background:#fff;border-radius:12px;padding:34px 34px 28px;box-shadow:0 18px 48px rgba(0,20,50,.35);position:relative;z-index:2}
+.login-card .brand{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.login-card .brand .logo{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#0081ff,#4da3ff);display:flex;align-items:center;justify-content:center;color:#fff}
+.login-card .brand .logo svg{width:22px;height:22px}
+.login-card h2{font-size:19px;color:var(--text)}
+.login-card .sub{font-size:12px;color:var(--text3);margin:4px 0 22px}
+.role-entry{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.role-entry .re{border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:left;cursor:pointer;transition:.15s;background:#fff}
+.role-entry .re:hover{border-color:var(--primary);background:var(--primary-light)}
+.role-entry .re .t{font-size:13px;font-weight:600;color:var(--text)}
+.role-entry .re .m{font-size:11px;color:var(--text3);margin-top:2px}
+.role-entry .re .ic{width:26px;height:26px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:6px;color:#fff}
+.role-entry .re .ic svg{width:14px;height:14px}
+.role-entry .re.a .ic{background:var(--primary)}
+.role-entry .re.b .ic{background:var(--side-sec)}
+.login-line{display:flex;align-items:center;gap:10px;color:var(--text3);font-size:12px;margin:16px 0}
+.login-line:before,.login-line:after{content:"";flex:1;height:1px;background:var(--border-light)}
+
+/* ===== 数据统计图表（静态示意） ===== */
+.chart-card{background:#fff;border:1px solid var(--border-light);border-radius:8px;padding:14px}
+.chart-card h4{font-size:13px;margin-bottom:10px;color:var(--text2)}
+.bars{display:flex;align-items:flex-end;gap:12px;height:150px;padding:0 6px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.bar-col .b{width:100%;max-width:34px;background:linear-gradient(180deg,#4da3ff,#0081ff);border-radius:4px 4px 0 0;min-height:6px}
+.bar-col .b.hl{background:linear-gradient(180deg,#f0c33c,#d4a017)}
+.bar-col .lb{font-size:11px;color:var(--text3)}
+.line-chart{position:relative;height:150px;padding:6px 0}
+.line-chart svg{width:100%;height:100%}
+
+/* ===== 弹窗/提示 ===== */
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:100}
+.modal-mask.on{display:flex}
+.modal{background:#fff;border-radius:10px;width:560px;max-width:800px;max-height:88vh;overflow:auto;padding:22px}
+.modal.wide{width:760px}
+.modal h3{font-size:16px;margin-bottom:6px}
+.modal .sub{font-size:12px;color:var(--text3);margin-bottom:16px}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.reason-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.reason-list label{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:6px;padding:9px 12px;font-size:13px;cursor:pointer;color:var(--text2)}
+.reason-list label:has(input:checked){border-color:var(--primary);background:var(--primary-light);color:var(--primary)}
+.reason-list input{accent-color:var(--primary)}
+.toast{position:fixed;left:50%;bottom:40px;transform:translateX(-50%);background:rgba(0,0,0,.78);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:200;display:none}
+.toast.on{display:block;animation:tp .25s ease}
+@keyframes tp{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+.adm-note{font-size:12px;color:var(--text3);padding:10px 4px 2px}
+.adm-note b{color:var(--text2)}
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="stage-side">
+    <div class="stage-title">后台管理端原型</div>
+    <div class="stage-grp">登录与会话</div>
+    <a href="#adm01" id="nav-adm01"><span class="no">P-ADM-01</span>登录</a>
+    <div class="stage-grp">管理员工作台</div>
+    <a href="#adm02" id="nav-adm02"><span class="no">P-ADM-02</span>工作台首页</a>
+    <a href="#adm03" id="nav-adm03"><span class="no">P-ADM-03</span>信息审核</a>
+    <a href="#adm04" id="nav-adm04"><span class="no">P-ADM-04</span>失物信息管理</a>
+    <a href="#adm05" id="nav-adm05"><span class="no">P-ADM-05</span>招领信息管理</a>
+    <a href="#adm06" id="nav-adm06"><span class="no">P-ADM-06</span>用户管理</a>
+    <a href="#adm07" id="nav-adm07"><span class="no">P-ADM-07</span>认领记录管理</a>
+    <a href="#adm08" id="nav-adm08"><span class="no">P-ADM-08</span>信用管理</a>
+    <a href="#adm09" id="nav-adm09"><span class="no">P-ADM-09</span>分类管理</a>
+    <a href="#adm10" id="nav-adm10"><span class="no">P-ADM-10</span>轮播图管理</a>
+    <a href="#adm11" id="nav-adm11"><span class="no">P-ADM-11</span>举报与申诉处理</a>
+    <a href="#adm12" id="nav-adm12"><span class="no">P-ADM-12</span>操作日志</a>
+    <a href="#adm13" id="nav-adm13"><span class="no">P-ADM-13</span>数据统计</a>
+    <div class="stage-grp">保卫处专用</div>
+    <a href="#adm14" id="nav-adm14"><span class="no">P-ADM-14</span>贵重物品工作台</a>
+    <a href="#adm15" id="nav-adm15"><span class="no">P-ADM-15</span>贵重物品台账</a>
+    <div class="stage-grp">通用</div>
+    <a href="#adm16" id="nav-adm16"><span class="no">P-ADM-16</span>个人中心</a>
+  </div>
+
+  <div class="stage-main">
+
+    <!-- ===== 视图：后台登录 P-ADM-01 ===== -->
+    <section class="view" id="view-adm01">
+      <div class="adm-wrap" style="border:none;box-shadow:none">
+        <div class="login-wrap" style="flex:1">
+          <div class="login-card">
+            <div class="brand">
+              <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg></div>
+              <div>
+                <h2>失物招领后台管理</h2>
+                <div class="sub">WarmSearch-Web · 管理员 / 保卫处登录</div>
+              </div>
+            </div>
+            <div class="role-entry">
+              <button class="re a" onclick="goto('adm02')">
+                <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4z"/><path d="M9 12l2 2 4-4"/></svg></span>
+                <span class="t">管理员演示账号</span>
+                <span class="m">admin · 12 项菜单</span>
+              </button>
+              <button class="re b" onclick="goto('adm14')">
+                <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 0-7 7c0 2.4 1.2 4.5 3 5.8V19h8v-4.2c1.8-1.3 3-3.4 3-5.8a7 7 0 0 0-7-7z"/><path d="M12 14v2M12 7v3"/></svg></span>
+                <span class="t">保卫处演示账号</span>
+                <span class="m">security · 3 项菜单</span>
+              </button>
+            </div>
+            <div class="login-line">账号密码登录</div>
+            <div class="form-row"><label>账号</label><input class="input" value="admin" onfocus="toast('演示：输入账号密码后点击登录')"></div>
+            <div class="form-row"><label>密码</label><input class="input" type="password" value="******" onfocus="toast('演示：输入账号密码后点击登录')"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <label class="check"><input type="checkbox" checked> 记住我</label>
+              <a onclick="toast('演示：通过管理员重置密码，或联系平台客服')" style="font-size:12px;color:var(--primary);cursor:pointer">忘记密码？</a>
+            </div>
+            <button class="btn btn-primary btn-block" style="height:40px" onclick="toast('演示：校验通过，进入工作台首页')">登 录</button>
+            <div class="credit-tip" style="margin-top:16px;margin-bottom:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg>登录失败 5 次将锁定 15 分钟（FR-AUTH-06）；无权限角色访问返回 403（ST-06）</div>
+          </div>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-01 登录</b>（改造）· 关联 FR-AUTH-06 · 双角色演示入口：管理员→P-ADM-02，保卫处→P-ADM-14</div>
+    </section>
+
+    <!-- ===== 视图：工作台首页 P-ADM-02 ===== -->
+    <section class="view" id="view-adm02">
+      <div class="adm-wrap">
+        <aside class="adm-side" data-role="admin" data-active="adm02">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg><span>失物招领后台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>工作台首页 <span class="role-chip">管理员</span></h3>
+          <div class="sub">今日概览与待办 · 快捷入口直达核心业务（FR-ADMIN-10）</div>
+          <div class="stat-cards">
+            <div class="stat" onclick="goto('adm03')"><div class="num">12</div><div class="lbl">待审核信息</div><div class="delta">3 条超时</div></div>
+            <div class="stat" onclick="goto('adm11')"><div class="num">5</div><div class="lbl">待处理举报 / 申诉</div><div class="delta">2 条申诉</div></div>
+            <div class="stat" onclick="goto('adm14')"><div class="num">4</div><div class="lbl">贵重物品待审核</div><div class="delta">1 条超期</div></div>
+            <div class="stat" onclick="goto('adm07')"><div class="num">6</div><div class="lbl">待核验认领</div><div class="delta">2 条凭证待查</div></div>
+            <div class="stat" onclick="goto('adm13')"><div class="num">86</div><div class="lbl">今日通过发布</div><div class="delta">较昨日 +12%</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:14px">
+            <div class="card" style="padding:14px">
+              <h4 style="font-size:14px;margin-bottom:12px">近期待办</h4>
+              <table class="table">
+                <thead><tr><th style="width:38%">事项</th><th style="width:22%">来源</th><th style="width:22%">时间</th><th style="width:18%">操作</th></tr></thead>
+                <tbody>
+                  <tr><td>校园卡（一卡通）审核 <span class="tag t-pending" style="margin-left:6px">超时</span></td><td>信息审核</td><td>10-07 09:30</td><td><button class="btn btn-sm btn-primary" onclick="goto('adm03')">去处理</button></td></tr>
+                  <tr><td>举报：重复发布疑似虚假信息</td><td>举报与申诉</td><td>10-08 08:40</td><td><button class="btn btn-sm btn-primary" onclick="goto('adm11')">去处理</button></td></tr>
+                  <tr><td>白色 iPhone 15 认领凭证核验</td><td>认领记录</td><td>10-08 09:10</td><td><button class="btn btn-sm btn-primary" onclick="goto('adm07')">去处理</button></td></tr>
+                  <tr><td>身份证超 48h 未审核 <span class="tag t-ovr" style="margin-left:6px">预警</span></td><td>贵重物品</td><td>10-06 11:20</td><td><button class="btn btn-sm btn-primary" onclick="goto('adm14')">去处理</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card" style="padding:14px">
+              <h4 style="font-size:14px;margin-bottom:12px">快捷入口</h4>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div class="stat" onclick="goto('adm03')"><div class="lbl">信息审核</div><div class="num" style="font-size:18px">03</div></div>
+                <div class="stat" onclick="goto('adm08')"><div class="lbl">信用管理</div><div class="num" style="font-size:18px">08</div></div>
+                <div class="stat" onclick="goto('adm14')"><div class="lbl">贵重物品工作台</div><div class="num" style="font-size:18px">14</div></div>
+                <div class="stat" onclick="goto('adm13')"><div class="lbl">数据统计</div><div class="num" style="font-size:18px">13</div></div>
+              </div>
+              <div class="credit-tip" style="margin-top:12px;margin-bottom:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg>超 24h 未审与超 48h 贵重物品未处理需醒目预警（FR-ADMIN-03、FR-SEC-06）</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-02 工作台首页</b>（重做）· 关联 FR-ADMIN-10 · 统计卡片 + 快捷入口 + 近期待办</div>
+    </section>
+
+    <!-- ===== 视图：信息审核 P-ADM-03 ===== -->
+    <section class="view" id="view-adm03">
+      <div class="adm-wrap">
+        <aside class="adm-side" data-role="admin" data-active="adm03">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg><span>失物招领后台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>信息审核 <span class="role-chip">管理员</span></h3>
+          <div class="sub">审核学生发布的失物 / 招领信息 · 超过 24 小时未审需红色标识（FR-ADMIN-03）</div>
+          <div class="stat-cards">
+            <div class="stat" onclick="toast('演示：筛选待审核')"><div class="num">12</div><div class="lbl">待审核</div></div>
+            <div class="stat alert" onclick="toast('演示：筛选超时未审')"><div class="num">3</div><div class="lbl">超时未审</div></div>
+            <div class="stat" onclick="toast('演示：筛选今日通过')"><div class="num">86</div><div class="lbl">今日通过</div></div>
+            <div class="stat" onclick="toast('演示：筛选今日驳回')"><div class="num">9</div><div class="lbl">今日驳回</div></div>
+            <div class="stat" onclick="toast('演示：筛选判定虚假')"><div class="num">2</div><div class="lbl">判定虚假</div></div>
+          </div>
+          <div class="filter-bar">
+            <div class="seg"><button class="on">全部</button><button>寻失物</button><button>寻失主</button></div>
+            <select class="select" style="width:130px"><option>全部分类</option><option>证件类</option><option>电子设备类</option><option>随身物品</option></select>
+            <input class="input" style="width:180px" placeholder="关键字">
+            <div class="grow"></div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modalBatch')">批量通过</button>
+            <button class="btn btn-ghost btn-sm" onclick="openModal('modalBatch')">批量驳回</button>
+          </div>
+          <table class="table">
+            <colgroup><col style="width:5%"><col style="width:7%"><col style="width:26%"><col style="width:10%"><col style="width:13%"><col style="width:13%"><col style="width:12%"><col style="width:14%"></colgroup>
+            <thead><tr><th><input type="checkbox"></th><th>缩略图</th><th>信息标题</th><th>类型</th><th>发布者</th><th>提交时间</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td><input type="checkbox"></td><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg></div></td><td>校园卡（一卡通）</td><td><span class="tag t-pub">寻失主</span></td><td>李**（L5）</td><td>2026-10-08 09:35</td><td><span class="tag t-pending">待审核</span></td><td><button class="btn btn-sm btn-primary" onclick="openModal('modalAudit')">审核</button></td></tr>
+              <tr><td><input type="checkbox"></td><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><circle cx="12" cy="16" r="1"/></svg></div></td><td>白色 iPhone 15 <span class="tag t-valuable" style="margin-left:6px">贵重</span></td><td><span class="tag t-pub">寻失主</span></td><td>王**（L3）</td><td>2026-10-08 08:10</td><td><span class="tag t-pending">待审核</span></td><td><button class="btn btn-sm btn-primary" onclick="openModal('modalAudit')">审核</button></td></tr>
+              <tr><td><input type="checkbox"></td><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10a8 8 0 0 1 16 0v4l2 3H2l2-3v-4z"/></svg></div></td><td>黑色蓝牙耳机（左耳）</td><td><span class="tag t-pub">寻失主</span></td><td>张**（L3）</td><td>2026-10-07 22:40</td><td><span class="tag t-ovr">待审核 · 超时</span></td><td><button class="btn btn-sm btn-primary" onclick="openModal('modalAudit')">审核</button></td></tr>
+              <tr><td><input type="checkbox"></td><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2h12v20H6V2zM9 6h6M9 10h6"/></svg></div></td><td>黑色笔记本（活页）</td><td><span class="tag t-pub">寻失主</span></td><td>赵**（L2）</td><td>2026-10-07 21:15</td><td><span class="tag t-rej">已驳回</span></td><td><button class="btn btn-sm btn-ghost" onclick="toast('演示：查看详情')">查看</button></td></tr>
+              <tr><td><input type="checkbox"></td><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div></td><td>灰色双肩背包（疑似虚假）</td><td><span class="tag t-pub">寻失物</span></td><td>周**（L1）</td><td>2026-10-07 19:02</td><td><span class="tag" style="background:#fef0f0;color:#f56c6c">判定虚假</span></td><td><button class="btn btn-sm btn-ghost" onclick="toast('演示：查看详情')">查看</button></td></tr>
+            </tbody>
+          </table>
+          <div class="filter-bar" style="justify-content:flex-end;margin-top:12px">
+            <span class="muted">共 12 条待审核</span><button class="btn btn-sm btn-ghost" onclick="toast('演示：上一页')">上一页</button><button class="btn btn-sm btn-primary">1</button><button class="btn btn-sm btn-ghost" onclick="toast('演示：下一页')">下一页</button>
+          </div>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-03 信息审核台</b>（新增）· 关联 FR-ADMIN-01 至 04 · 快捷驳回原因：信息不完整 / 含违规内容 / 疑似虚假信息 / 重复发布</div>
+    </section>
+
+    <!-- ===== 视图：失物信息管理 P-ADM-04 ===== -->
+    <section class="view" id="view-adm04">
+      <div class="adm-wrap">
+        <aside class="adm-side" data-role="admin" data-active="adm04">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg><span>失物招领后台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>失物信息管理 <span class="role-chip">管理员</span></h3>
+          <div class="sub">管理用户发布的寻失物信息 · 支持筛选、详情查看与删除（FR-LOST-12、FR-ADMIN-04）</div>
+          <div class="filter-bar">
+            <div class="seg"><button class="on">全部</button><button>已发布</button><button>已找回</button><button>已删除</button></div>
+            <select class="select" style="width:130px"><option>全部分类</option><option>证件类</option><option>电子设备类</option></select>
+            <input class="input" style="width:150px" placeholder="开始日期">
+            <input class="input" style="width:150px" placeholder="结束日期">
+            <input class="input" style="width:160px" placeholder="关键字 / 学号">
+            <div class="grow"></div>
+            <button class="btn btn-ghost btn-sm" onclick="toast('演示：导出列表')">导出</button>
+          </div>
+          <table class="table">
+            <colgroup><col style="width:7%"><col style="width:24%"><col style="width:13%"><col style="width:13%"><col style="width:13%"><col style="width:12%"><col style="width:18%"></colgroup>
+            <thead><tr><th>缩略图</th><th>物品名称</th><th>发布者</th><th>丢失时间</th><th>发布时间</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg></div></td><td>黑色蓝牙耳机（左耳）</td><td>张** 55230412</td><td>2026-10-07 12:40</td><td>2026-10-07 13:02</td><td><span class="tag t-pub">已发布</span></td><td><button class="btn btn-sm btn-ghost" onclick="openModal('modalDetail')">详情</button><button class="btn btn-sm btn-danger" style="margin-left:6px" onclick="openModal('modalDel')">删除</button></td></tr>
+              <tr><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div></td><td>灰色双肩背包</td><td>徐** 55230217</td><td>2026-10-03 09:10</td><td>2026-10-03 09:30</td><td><span class="tag t-done">已找回</span></td><td><button class="btn btn-sm btn-ghost" onclick="openModal('modalDetail')">详情</button><button class="btn btn-sm btn-danger" style="margin-left:6px" onclick="openModal('modalDel')">删除</button></td></tr>
+              <tr><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2h12v20H6V2zM9 6h6M9 10h6"/></svg></div></td><td>高等数学教材（上册）</td><td>王** 55230888</td><td>2026-10-05 16:20</td><td>2026-10-05 16:40</td><td><span class="tag t-rej">已删除</span></td><td><button class="btn btn-sm btn-ghost" onclick="toast('演示：已删除记录仅可查看')">查看</button></td></tr>
+              <tr><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10a8 8 0 0 1 16 0v4l2 3H2l2-3v-4z"/></svg></div></td><td>小米充电宝 20000mAh</td><td>李** 55230110</td><td>2026-10-06 18:05</td><td>2026-10-06 18:22</td><td><span class="tag t-pub">已发布</span></td><td><button class="btn btn-sm btn-ghost" onclick="openModal('modalDetail')">详情</button><button class="btn btn-sm btn-danger" style="margin-left:6px" onclick="openModal('modalDel')">删除</button></td></tr>
+            </tbody>
+          </table>
+          <div class="filter-bar" style="justify-content:flex-end;margin-top:12px">
+            <span class="muted">共 23 条失物信息</span><button class="btn btn-sm btn-ghost" onclick="toast('演示：上一页')">上一页</button><button class="btn btn-sm btn-primary">1</button><button class="btn btn-sm btn-ghost" onclick="toast('演示：下一页')">下一页</button>
+          </div>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-04 失物信息管理</b>（改造）· 关联 FR-LOST-12、FR-ADMIN-04 · 删除需二次确认（ST-10）</div>
+    </section>
+
+    <!-- ===== 视图：招领信息管理 P-ADM-05 ===== -->
+    <section class="view" id="view-adm05">
+      <div class="adm-wrap">
+        <aside class="adm-side" data-role="admin" data-active="adm05">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg><span>失物招领后台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>招领信息管理 <span class="role-chip">管理员</span></h3>
+          <div class="sub">管理用户发布的寻失主（招领）信息 · 贵重物品自动转入保卫处流程（FR-FOUND-06、FR-ADMIN-04）</div>
+          <div class="filter-bar">
+            <div class="seg"><button class="on">全部</button><button>已发布</button><button>贵重物品</button><button>已认领</button></div>
+            <select class="select" style="width:130px"><option>全部分类</option><option>证件类</option><option>电子设备类</option><option>随身物品</option></select>
+            <input class="input" style="width:180px" placeholder="关键字">
+            <div class="grow"></div>
+            <button class="btn btn-ghost btn-sm" onclick="toast('演示：导出列表')">导出</button>
+          </div>
+          <table class="table">
+            <colgroup><col style="width:7%"><col style="width:26%"><col style="width:13%"><col style="width:13%"><col style="width:12%"><col style="width:13%"><col style="width:16%"></colgroup>
+            <thead><tr><th>缩略图</th><th>物品名称</th><th>拾获者</th><th>拾获地点</th><th>发布时间</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg></div></td><td>校园卡（一卡通） <span class="tag t-valuable" style="margin-left:6px">贵重</span></td><td>李**（L5）</td><td>图书馆二楼大厅</td><td>2026-10-08 09:35</td><td><span class="tag t-pending">待审核</span></td><td><button class="btn btn-sm btn-primary" onclick="openModal('modalAudit')">审核</button><button class="btn btn-sm btn-ghost" style="margin-left:6px" onclick="openModal('modalDetail')">详情</button></td></tr>
+              <tr><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><circle cx="12" cy="16" r="1"/></svg></div></td><td>白色 iPhone 15 <span class="tag t-valuable" style="margin-left:6px">贵重</span></td><td>王**（L3）</td><td>三教 305 教室</td><td>2026-10-08 08:10</td><td><span class="tag t-pending">待审核</span></td><td><button class="btn btn-sm btn-primary" onclick="openModal('modalAudit')">审核</button><button class="btn btn-sm btn-ghost" style="margin-left:6px" onclick="openModal('modalDetail')">详情</button></td></tr>
+              <tr><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10a8 8 0 0 1 16 0v4l2 3H2l2-3v-4z"/></svg></div></td><td>银色无线耳机</td><td>赵**（L2）</td><td>操场看台</td><td>2026-10-06 15:10</td><td><span class="tag t-done">已认领</span></td><td><button class="btn btn-sm btn-ghost" onclick="openModal('modalDetail')">详情</button></td></tr>
+              <tr><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a7 7 0 0 0-7 7c0 2.4 1.2 4.5 3 5.8V19h8v-4.2c1.8-1.3 3-3.4 3-5.8a7 7 0 0 0-7-7z"/><path d="M12 9v3M12 15.5v.5"/></svg></div></td><td>银色手表</td><td>孙**（L4）</td><td>综合楼 12 层</td><td>2026-10-06 10:00</td><td><span class="tag t-queue">超期公示</span></td><td><button class="btn btn-sm btn-ghost" onclick="toast('演示：查看移交记录')">详情</button></td></tr>
+            </tbody>
+          </table>
+          <div class="filter-bar" style="justify-content:flex-end;margin-top:12px">
+            <span class="muted">共 31 条招领信息</span><button class="btn btn-sm btn-ghost" onclick="toast('演示：上一页')">上一页</button><button class="btn btn-sm btn-primary">1</button><button class="btn btn-sm btn-ghost" onclick="toast('演示：下一页')">下一页</button>
+          </div>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-05 招领信息管理</b>（改造）· 关联 FR-FOUND-06、FR-ADMIN-04 · 贵重物品标记后联动 P-ADM-14</div>
+    </section>
+
+    <!-- ===== 视图：用户管理 P-ADM-06 ===== -->
+    <section class="view" id="view-adm06">
+      <div class="adm-wrap">
+        <aside class="adm-side" data-role="admin" data-active="adm06">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg><span>失物招领后台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>用户管理 <span class="role-chip">管理员</span></h3>
+          <div class="sub">学生用户账号管理 · 密码列已隐藏（FR-ADMIN-06）· 封禁 / 解封需二次确认（FR-ADMIN-07）</div>
+          <div class="filter-bar">
+            <input class="input" style="width:200px" placeholder="学号 / 姓名 / 手机号检索">
+            <select class="select" style="width:130px"><option>全部状态</option><option>正常</option><option>已封禁</option><option>待认证</option></select>
+            <select class="select" style="width:130px"><option>全部信用等级</option><option>L1 失信</option><option>L2 一般</option><option>L3 良好</option><option>L4 优秀</option><option>L5 诚信模范</option></select>
+            <div class="grow"></div>
+            <button class="btn btn-ghost btn-sm" onclick="toast('演示：导出用户列表')">导出</button>
+          </div>
+          <table class="table">
+            <colgroup><col style="width:14%"><col style="width:13%"><col style="width:11%"><col style="width:13%"><col style="width:13%"><col style="width:12%"><col style="width:24%"></colgroup>
+            <thead><tr><th>用户</th><th>学号</th><th>信用等级</th><th>注册时间</th><th>发布 / 认领</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>徐晓阳</td><td>55230217</td><td><span class="lv lv-l4">L4 优秀</span></td><td>2024-09-01</td><td>12 / 5</td><td><span class="tag t-done">正常</span></td><td><button class="btn btn-sm btn-ghost" onclick="toast('演示：查看用户详情')">详情</button><button class="btn btn-sm btn-ghost" style="margin-left:6px" onclick="toast('演示：重置密码（需管理员二次确认）')">重置密码</button></td></tr>
+              <tr><td>李**</td><td>55230110</td><td><span class="lv lv-l5">L5 诚信模范</span></td><td>2023-09-01</td><td>45 / 18</td><td><span class="tag t-done">正常</span></td><td><button class="btn btn-sm btn-ghost" onclick="toast('演示：查看用户详情')">详情</button><button class="btn btn-sm btn-ghost" style="margin-left:6px" onclick="toast('演示：重置密码（需管理员二次确认）')">重置密码</button></td></tr>
+              <tr><td>周**</td><td>55230812</td><td><span class="lv lv-l1">L1 失信</span></td><td>2024-09-02</td><td>3 / 1</td><td><span class="tag t-ovr">已封禁</span></td><td><button class="btn btn-sm btn-ghost" onclick="toast('演示：查看用户详情')">详情</button><button class="btn btn-sm btn-success" style="margin-left:6px" onclick="openModal('modalUnban')">解封</button></td></tr>
+              <tr><td>孙**</td><td>55230605</td><td><span class="lv lv-l3">L3 良好</span></td><td>2025-03-10</td><td>8 / 6</td><td><span class="tag t-done">正常</span></td><td><button class="btn btn-sm btn-ghost" onclick="toast('演示：查看用户详情')">详情</button><button class="btn btn-sm btn-danger" style="margin-left:6px" onclick="openModal('modalBan')">封禁</button></td></tr>
+              <tr><td>钱**</td><td>55230933</td><td><span class="lv lv-l2">L2 一般</span></td><td>2025-09-15</td><td>2 / 0</td><td><span class="tag t-pending">待认证</span></td><td><button class="btn btn-sm btn-ghost" onclick="toast('演示：查看用户详情')">详情</button><button class="btn btn-sm btn-ghost" style="margin-left:6px" onclick="toast('演示：发送认证提醒')">提醒认证</button></td></tr>
+            </tbody>
+          </table>
+          <div class="filter-bar" style="justify-content:flex-end;margin-top:12px">
+            <span class="muted">共 1240 名用户</span><button class="btn btn-sm btn-ghost" onclick="toast('演示：上一页')">上一页</button><button class="btn btn-sm btn-primary">1</button><button class="btn btn-sm btn-ghost" onclick="toast('演示：下一页')">下一页</button>
+          </div>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-06 用户管理</b>（改造）· 关联 FR-ADMIN-05 至 07 · 密码列隐藏、封禁二次确认</div>
+    </section>
+
+    <!-- ===== 视图：认领记录管理 P-ADM-07 ===== -->
+    <section class="view" id="view-adm07">
+      <div class="adm-wrap">
+        <aside class="adm-side" data-role="admin" data-active="adm07">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg><span>失物招领后台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>认领记录管理 <span class="role-chip">管理员</span></h3>
+          <div class="sub">查看全部认领申请与核验结果 · 凭证核验意见必填（FR-CLAIM-09）</div>
+          <div class="filter-bar">
+            <div class="seg"><button class="on">全部</button><button>待核验</button><button>已通过</button><button>已驳回</button></div>
+            <select class="select" style="width:140px"><option>全部物品类型</option><option>普通物品</option><option>贵重物品</option></select>
+            <input class="input" style="width:160px" placeholder="关键字 / 学号">
+            <div class="grow"></div>
+            <button class="btn btn-ghost btn-sm" onclick="toast('演示：导出认领记录')">导出</button>
+          </div>
+          <table class="table">
+            <colgroup><col style="width:19%"><col style="width:16%"><col style="width:12%"><col style="width:13%"><col style="width:13%"><col style="width:12%"><col style="width:15%"></colgroup>
+            <thead><tr><th>物品</th><th>认领人</th><th>认领时间</th><th>凭证状态</th><th>核验结果</th><th>类型</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>校园卡（一卡通）</td><td>徐** 55230217</td><td>2026-10-08 10:20</td><td><span class="tag t-verify">已上传 2 张</span></td><td><span class="tag t-pending">待核验</span></td><td><span class="tag t-valuable">贵重</span></td><td><button class="btn btn-sm btn-primary" onclick="openModal('modalClaim')">核验</button></td></tr>
+              <tr><td>白色 iPhone 15</td><td>王** 55230456</td><td>2026-10-08 09:10</td><td><span class="tag t-verify">已上传 3 张</span></td><td><span class="tag t-pending">待核验</span></td><td><span class="tag t-valuable">贵重</span></td><td><button class="btn btn-sm btn-primary" onclick="openModal('modalClaim')">核验</button></td></tr>
+              <tr><td>灰色双肩背包</td><td>徐** 55230217</td><td>2026-10-05 14:30</td><td><span class="tag t-done">已核验</span></td><td><span class="tag t-done">通过</span></td><td><span class="tag t-pub">普通</span></td><td><button class="btn btn-sm btn-ghost" onclick="openModal('modalClaim')">查看</button></td></tr>
+              <tr><td>银色无线耳机</td><td>赵** 55230987</td><td>2026-10-06 16:00</td><td><span class="tag t-rej">未提供</span></td><td><span class="tag t-rej">已驳回</span></td><td><span class="tag t-pub">普通</span></td><td><button class="btn btn-sm btn-ghost" onclick="openModal('modalClaim')">查看</button></td></tr>
+            </tbody>
+          </table>
+          <div class="filter-bar" style="justify-content:flex-end;margin-top:12px">
+            <span class="muted">共 56 条认领记录</span><button class="btn btn-sm btn-ghost" onclick="toast('演示：上一页')">上一页</button><button class="btn btn-sm btn-primary">1</button><button class="btn btn-sm btn-ghost" onclick="toast('演示：下一页')">下一页</button>
+          </div>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-07 认领记录管理</b>（改造）· 关联 FR-CLAIM-09 · 贵重物品凭证核验联动 P-ADM-14</div>
+    </section>
+
+    <!-- ===== 视图：信用管理 P-ADM-08 ===== -->
+    <section class="view" id="view-adm08">
+      <div class="adm-wrap">
+        <aside class="adm-side" data-role="admin" data-active="adm08">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg><span>失物招领后台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>信用管理 <span class="role-chip">管理员</span></h3>
+          <div class="sub">人工信用调整必须填写调整原因并留痕（操作人、时间、原值、新值、原因）· L1 失信禁认领（FR-CREDIT-11、FR-CREDIT-03）</div>
+          <div class="filter-bar">
+            <input class="input" style="width:200px" placeholder="学号 / 姓名检索">
+            <select class="select" style="width:130px"><option>全部等级</option><option>L1 失信</option><option>L2 一般</option><option>L3 良好</option><option>L4 优秀</option><option>L5 诚信模范</option></select>
+            <div class="grow"></div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modalCredit')">人工调整</button>
+          </div>
+          <table class="table">
+            <colgroup><col style="width:17%"><col style="width:10%"><col style="width:12%"><col style="width:10%"><col style="width:16%"><col style="width:13%"><col style="width:22%"></colgroup>
+            <thead><tr><th>用户</th><th>信用分</th><th>等级</th><th>归还次数</th><th>失信记录</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>徐晓阳 55230217</td><td>108</td><td><span class="lv lv-l4">L4 优秀</span></td><td>5</td><td>0</td><td><span class="tag t-done">正常</span></td><td><button class="btn btn-sm btn-ghost" onclick="openModal('modalFlow')">流水</button><button class="btn btn-sm btn-ghost" style="margin-left:6px" onclick="openModal('modalCredit')">调整</button></td></tr>
+              <tr><td>李** 55230110</td><td>132</td><td><span class="lv lv-l5">L5 诚信模范</span></td><td>18</td><td>0</td><td><span class="tag t-done">正常</span></td><td><button class="btn btn-sm btn-ghost" onclick="openModal('modalFlow')">流水</button><button class="btn btn-sm btn-ghost" style="margin-left:6px" onclick="openModal('modalCredit')">调整</button></td></tr>
+              <tr><td>周** 55230812</td><td>42</td><td><span class="lv lv-l1">L1 失信</span></td><td>1</td><td>3</td><td><span class="tag t-ovr">失信限制</span></td><td><button class="btn btn-sm btn-ghost" onclick="openModal('modalFlow')">流水</button><button class="btn btn-sm btn-ghost" style="margin-left:6px" onclick="openModal('modalCredit')">调整</button></td></tr>
+              <tr><td>孙** 55230605</td><td>88</td><td><span class="lv lv-l3">L3 良好</span></td><td>6</td><td>1</td><td><span class="tag t-verify">已警告</span></td><td><button class="btn btn-sm btn-ghost" onclick="openModal('modalFlow')">流水</button><button class="btn btn-sm btn-ghost" style="margin-left:6px" onclick="openModal('modalCredit')">调整</button></td></tr>
+            </tbody>
+          </table>
+          <div class="credit-tip" style="margin-top:12px;margin-bottom:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg>信用规则：初始 100 分；归还普通 +5 / 贵重 +10；按约认领 +2；虚假认领 -20（恶意 -50 并冻结）；L1（&lt;60 分）禁认领、日发布上限 2 条（SRS 3.5）</div>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-08 信用管理</b>（新增）· 关联 FR-CREDIT-11、FR-CREDIT-03 · 人工调整原因必填并留痕</div>
+    </section>
+
+    <!-- ===== 视图：分类管理 P-ADM-09 ===== -->
+    <section class="view" id="view-adm09">
+      <div class="adm-wrap">
+        <aside class="adm-side" data-role="admin" data-active="adm09">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg><span>失物招领后台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>分类管理 <span class="role-chip">管理员</span></h3>
+          <div class="sub">维护物品分类字典 · 启用 / 停用影响前台发布选项（FR-ADMIN-08）</div>
+          <div class="filter-bar">
+            <input class="input" style="width:200px" placeholder="分类名称检索">
+            <div class="grow"></div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modalCat')">新增分类</button>
+          </div>
+          <table class="table">
+            <colgroup><col style="width:22%"><col style="width:26%"><col style="width:10%"><col style="width:12%"><col style="width:14%"><col style="width:16%"></colgroup>
+            <thead><tr><th>分类名称</th><th>说明</th><th>排序</th><th>物品数量</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>证件类</td><td>校园卡、身份证、学生证等</td><td>1</td><td>128</td><td><span class="tag t-done">启用</span></td><td><button class="btn btn-sm btn-ghost" onclick="openModal('modalCat')">编辑</button><button class="btn btn-sm btn-danger" style="margin-left:6px" onclick="openModal('modalDel')">删除</button></td></tr>
+              <tr><td>电子设备类</td><td>手机、耳机、充电宝、笔记本等</td><td>2</td><td>86</td><td><span class="tag t-done">启用</span></td><td><button class="btn btn-sm btn-ghost" onclick="openModal('modalCat')">编辑</button><button class="btn btn-sm btn-danger" style="margin-left:6px" onclick="openModal('modalDel')">删除</button></td></tr>
+              <tr><td>随身物品</td><td>背包、伞、水杯、钥匙等</td><td>3</td><td>143</td><td><span class="tag t-done">启用</span></td><td><button class="btn btn-sm btn-ghost" onclick="openModal('modalCat')">编辑</button><button class="btn btn-sm btn-danger" style="margin-left:6px" onclick="openModal('modalDel')">删除</button></td></tr>
+              <tr><td>书籍文具</td><td>教材、笔记本、文具等</td><td>4</td><td>52</td><td><span class="tag t-rej">停用</span></td><td><button class="btn btn-sm btn-ghost" onclick="toast('演示：启用分类')">启用</button></td></tr>
+              <tr><td>其他</td><td>无法归入以上分类的物品</td><td>9</td><td>21</td><td><span class="tag t-done">启用</span></td><td><button class="btn btn-sm btn-ghost" onclick="openModal('modalCat')">编辑</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-09 分类管理</b>（改造）· 关联 FR-ADMIN-08 · 字典启停即时生效</div>
+    </section>
+
+    <!-- ===== 视图：轮播图管理 P-ADM-10 ===== -->
+    <section class="view" id="view-adm10">
+      <div class="adm-wrap">
+        <aside class="adm-side" data-role="admin" data-active="adm10">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg><span>失物招领后台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>轮播图管理 <span class="role-chip">管理员</span></h3>
+          <div class="sub">维护 PC 前台首页轮播图 · 支持上传与排序（FR-ADMIN-09）</div>
+          <div class="filter-bar">
+            <div class="seg"><button class="on">全部</button><button>启用</button><button>停用</button></div>
+            <div class="grow"></div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modalUpload')">上传轮播图</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+            <div class="card" style="padding:12px">
+              <div style="height:110px;border-radius:6px;background:linear-gradient(135deg,#0081ff,#4da3ff);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600">信用积分系统上线</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+                <span style="font-size:13px;font-weight:600;flex:1">信用激励 Banner</span>
+                <span class="tag t-done">启用</span>
+              </div>
+              <div style="font-size:11px;color:var(--text3);margin:4px 0 8px">跳转：信用排行榜 · 排序 1</div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-sm btn-ghost" onclick="toast('演示：上移')">上移</button>
+                <button class="btn btn-sm btn-ghost" onclick="toast('演示：下移')">下移</button>
+                <button class="btn btn-sm btn-ghost" onclick="openModal('modalUpload')">编辑</button>
+                <button class="btn btn-sm btn-danger" onclick="openModal('modalDel')">删除</button>
+              </div>
+            </div>
+            <div class="card" style="padding:12px">
+              <div style="height:110px;border-radius:6px;background:linear-gradient(135deg,#22303f,#3a4f6b);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600">贵重物品安全保管</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+                <span style="font-size:13px;font-weight:600;flex:1">保卫处服务 Banner</span>
+                <span class="tag t-done">启用</span>
+              </div>
+              <div style="font-size:11px;color:var(--text3);margin:4px 0 8px">跳转：帮助与规则 · 排序 2</div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-sm btn-ghost" onclick="toast('演示：上移')">上移</button>
+                <button class="btn btn-sm btn-ghost" onclick="toast('演示：下移')">下移</button>
+                <button class="btn btn-sm btn-ghost" onclick="openModal('modalUpload')">编辑</button>
+                <button class="btn btn-sm btn-danger" onclick="openModal('modalDel')">删除</button>
+              </div>
+            </div>
+            <div class="card" style="padding:12px">
+              <div style="height:110px;border-radius:6px;background:linear-gradient(135deg,#67c23a,#8fd46a);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600">十月文明月活动</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+                <span style="font-size:13px;font-weight:600;flex:1">活动宣传 Banner</span>
+                <span class="tag t-rej">停用</span>
+              </div>
+              <div style="font-size:11px;color:var(--text3);margin:4px 0 8px">跳转：活动专题 · 排序 3</div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-sm btn-ghost" onclick="toast('演示：启用')">启用</button>
+                <button class="btn btn-sm btn-ghost" onclick="openModal('modalUpload')">编辑</button>
+                <button class="btn btn-sm btn-danger" onclick="openModal('modalDel')">删除</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-10 轮播图管理</b>（改造）· 关联 FR-ADMIN-09 · 上传即预览、拖拽 / 按钮排序</div>
+    </section>
+
+    <!-- ===== 视图：举报与申诉处理 P-ADM-11 ===== -->
+    <section class="view" id="view-adm11">
+      <div class="adm-wrap">
+        <aside class="adm-side" data-role="admin" data-active="adm11">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg><span>失物招领后台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>举报与申诉处理 <span class="role-chip">管理员</span></h3>
+          <div class="sub">处理信息举报与信用扣分申诉 · 驳回需填写原因（FR-CLAIM-10、FR-CREDIT-10）</div>
+          <div class="tabbar-tabs">
+            <button class="on">举报 <span class="cnt">3</span></button>
+            <button>申诉 <span class="cnt">2</span></button>
+            <button>已处理</button>
+          </div>
+          <table class="table">
+            <colgroup><col style="width:22%"><col style="width:15%"><col style="width:13%"><col style="width:16%"><col style="width:16%"><col style="width:18%"></colgroup>
+            <thead><tr><th>事项</th><th>类型</th><th>提交人</th><th>提交时间</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td>举报：发布疑似虚假信息「灰色双肩背包」</td><td><span class="tag t-ovr">举报</span></td><td>孙** 55230605</td><td>2026-10-08 08:40</td><td><span class="tag t-pending">待处理</span></td><td><button class="btn btn-sm btn-primary" onclick="openModal('modalReport')">处理</button></td></tr>
+              <tr><td>举报：信息含联系方式与隐私内容</td><td><span class="tag t-ovr">举报</span></td><td>李** 55230110</td><td>2026-10-07 21:05</td><td><span class="tag t-pending">待处理</span></td><td><button class="btn btn-sm btn-primary" onclick="openModal('modalReport')">处理</button></td></tr>
+              <tr><td>申诉：对「发布虚假信息」扣分提出申诉</td><td><span class="tag t-verify">申诉</span></td><td>周** 55230812</td><td>2026-10-06 14:20</td><td><span class="tag t-pending">待处理</span></td><td><button class="btn btn-sm btn-primary" onclick="openModal('modalAppeal')">处理</button></td></tr>
+              <tr><td>举报：重复发布同类信息</td><td><span class="tag t-ovr">举报</span></td><td>王** 55230456</td><td>2026-10-05 10:11</td><td><span class="tag t-rej">已驳回</span></td><td><button class="btn btn-sm btn-ghost" onclick="toast('演示：查看处理记录')">查看</button></td></tr>
+              <tr><td>申诉：对「逾期未交接」扣分提出申诉</td><td><span class="tag t-verify">申诉</span></td><td>赵** 55230987</td><td>2026-10-05 09:30</td><td><span class="tag t-done">已处理</span></td><td><button class="btn btn-sm btn-ghost" onclick="toast('演示：查看处理记录')">查看</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-11 举报与申诉处理</b>（新增）· 关联 FR-CLAIM-10、FR-CREDIT-10 · 处理结果联动信用扣分 / 恢复</div>
+    </section>
+
+    <!-- ===== 视图：操作日志 P-ADM-12 ===== -->
+    <section class="view" id="view-adm12">
+      <div class="adm-wrap">
+        <aside class="adm-side" data-role="admin" data-active="adm12">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg><span>失物招领后台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>操作日志 <span class="role-chip">管理员</span></h3>
+          <div class="sub">全量审计日志 · 只读，记录不可修改、不可删除（FR-ADMIN-12）</div>
+          <div class="filter-bar">
+            <input class="input" style="width:150px" placeholder="开始日期">
+            <input class="input" style="width:150px" placeholder="结束日期">
+            <select class="select" style="width:140px"><option>全部模块</option><option>信息审核</option><option>信用管理</option><option>贵重物品</option><option>用户管理</option></select>
+            <input class="input" style="width:160px" placeholder="操作人">
+            <div class="grow"></div>
+            <button class="btn btn-ghost btn-sm" onclick="toast('演示：导出审计日志')">导出</button>
+          </div>
+          <table class="table">
+            <colgroup><col style="width:14%"><col style="width:11%"><col style="width:12%"><col style="width:22%"><col style="width:14%"><col style="width:27%"></colgroup>
+            <thead><tr><th>时间</th><th>操作人</th><th>模块</th><th>动作</th><th>结果</th><th>详情</th></tr></thead>
+            <tbody>
+              <tr><td>2026-10-08 11:05</td><td>陈**（保卫处）</td><td>贵重物品</td><td>凭证核验</td><td><span class="tag t-done">成功</span></td><td>SEC-20261008-01 校园卡 · 核验通过，安排线下核实</td></tr>
+              <tr><td>2026-10-08 10:42</td><td>admin</td><td>信息审核</td><td>批量通过</td><td><span class="tag t-done">成功</span></td><td>通过 2 条寻失主信息（ID 10241、10242）</td></tr>
+              <tr><td>2026-10-08 10:20</td><td>徐**（学生）</td><td>认领记录</td><td>提交认领</td><td><span class="tag t-done">成功</span></td><td>校园卡（一卡通）认领申请 + 凭证 2 张</td></tr>
+              <tr><td>2026-10-08 09:41</td><td>admin</td><td>信用管理</td><td>人工调整</td><td><span class="tag t-done">成功</span></td><td>周** 信用分 -15，原因：多次发布虚假信息（已留痕）</td></tr>
+              <tr><td>2026-10-08 08:55</td><td>admin</td><td>用户管理</td><td>封禁账号</td><td><span class="tag t-done">成功</span></td><td>钱** 55230933 封禁 7 天，原因：恶意认领</td></tr>
+              <tr><td>2026-10-07 21:40</td><td>系统</td><td>系统</td><td>超时预警</td><td><span class="tag t-verify">提醒</span></td><td>黑色蓝牙耳机（左耳）超 24h 未审核，已提醒</td></tr>
+            </tbody>
+          </table>
+          <div class="filter-bar" style="justify-content:flex-end;margin-top:12px">
+            <span class="muted">今日 386 条 · 共 28500 条</span><button class="btn btn-sm btn-ghost" onclick="toast('演示：上一页')">上一页</button><button class="btn btn-sm btn-primary">1</button><button class="btn btn-sm btn-ghost" onclick="toast('演示：下一页')">下一页</button>
+          </div>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-12 操作日志</b>（新增）· 关联 FR-ADMIN-12 · 只读审计 + 时间 / 操作人筛选</div>
+    </section>
+
+    <!-- ===== 视图：数据统计 P-ADM-13 ===== -->
+    <section class="view" id="view-adm13">
+      <div class="adm-wrap">
+        <aside class="adm-side" data-role="admin" data-active="adm13">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg><span>失物招领后台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>数据统计 <span class="role-chip">管理员</span></h3>
+          <div class="sub">平台运营与贵重物品处理统计 · 图表为静态示意（示例数据）· 支持导出（FR-ADMIN-10、FR-SEC-16）</div>
+          <div class="stat-cards c4">
+            <div class="stat"><div class="num">1,286</div><div class="lbl">本月发布总数</div><div class="delta">↑ 12%</div></div>
+            <div class="stat"><div class="num">92%</div><div class="lbl">信息审核通过率</div><div class="delta">↑ 3%</div></div>
+            <div class="stat"><div class="num">74%</div><div class="lbl">物品找回率</div><div class="delta">↑ 5%</div></div>
+            <div class="stat alert"><div class="num">3</div><div class="lbl">贵重物品超期</div><div class="delta" style="color:var(--danger)">需处理</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px">
+            <div class="chart-card">
+              <h4>近 30 天发布 / 认领趋势（示例数据）</h4>
+              <div class="line-chart">
+                <svg viewBox="0 0 600 150" preserveAspectRatio="none">
+                  <line x1="0" y1="130" x2="600" y2="130" stroke="#ebeef5" stroke-width="1"/>
+                  <line x1="0" y1="90" x2="600" y2="90" stroke="#f5f7fa" stroke-width="1"/>
+                  <line x1="0" y1="50" x2="600" y2="50" stroke="#f5f7fa" stroke-width="1"/>
+                  <line x1="0" y1="10" x2="600" y2="10" stroke="#f5f7fa" stroke-width="1"/>
+                  <polyline points="0,110 60,100 120,104 180,88 240,92 300,76 360,80 420,62 480,66 540,48 600,52" fill="none" stroke="#0081ff" stroke-width="2.5"/>
+                  <polyline points="0,126 60,122 120,118 180,114 240,110 300,100 360,96 420,88 480,84 540,76 600,70" fill="none" stroke="#67c23a" stroke-width="2.5" stroke-dasharray="5 4"/>
+                  <circle cx="540" cy="48" r="3.5" fill="#0081ff"/>
+                  <circle cx="600" cy="70" r="3.5" fill="#67c23a"/>
+                </svg>
+                <div style="display:flex;gap:16px;font-size:12px;color:var(--text3);margin-top:4px"><span style="display:inline-flex;align-items:center;gap:5px"><i style="width:14px;height:3px;background:#0081ff;display:inline-block"></i>发布</span><span style="display:inline-flex;align-items:center;gap:5px"><i style="width:14px;height:3px;background:#67c23a;display:inline-block"></i>认领</span></div>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h4>物品分类占比（本月）</h4>
+              <div style="display:flex;flex-direction:column;gap:12px;padding-top:6px">
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>证件类</span><span class="muted">42%</span></div><div class="progress-line" style="background:#f0f2f5"><i style="display:block;height:8px;border-radius:4px;width:42%;background:#0081ff"></i></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>电子设备类</span><span class="muted">31%</span></div><div class="progress-line" style="background:#f0f2f5"><i style="display:block;height:8px;border-radius:4px;width:31%;background:#67c23a"></i></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>随身物品</span><span class="muted">19%</span></div><div class="progress-line" style="background:#f0f2f5"><i style="display:block;height:8px;border-radius:4px;width:19%;background:#e6a23c"></i></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>其他</span><span class="muted">8%</span></div><div class="progress-line" style="background:#f0f2f5"><i style="display:block;height:8px;border-radius:4px;width:8%;background:#909399"></i></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="filter-bar" style="justify-content:flex-end;margin-bottom:0">
+            <span class="muted">统计区间：2026-09-09 至 2026-10-08 · 示例数据</span>
+            <button class="btn btn-primary btn-sm" onclick="toast('演示：导出统计报表 Excel / CSV')">导出报表</button>
+          </div>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-13 数据统计</b>（新增）· 关联 FR-ADMIN-10、FR-SEC-16 · 图表静态示意（示例数据）</div>
+    </section>
+
+    <!-- ===== 视图：贵重物品工作台 P-ADM-14 ===== -->
+    <section class="view" id="view-adm14">
+      <div class="adm-wrap">
+        <aside class="adm-side sec" data-role="security" data-active="adm14">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 0-7 7c0 2.4 1.2 4.5 3 5.8V19h8v-4.2c1.8-1.3 3-3.4 3-5.8a7 7 0 0 0-7-7z"/></svg><span>保卫处工作台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>贵重物品工作台 <span class="role-chip" style="background:#eef1f6;color:#22303f">保卫处</span></h3>
+          <div class="sub">保卫处专用 · 端到端留痕 · 超过 48 小时未处理需醒目超时标识（FR-SEC-06）</div>
+          <div class="stat-cards">
+            <div class="stat" onclick="toast('演示：筛选待审核')"><div class="num">4</div><div class="lbl">待审核</div></div>
+            <div class="stat" onclick="toast('演示：筛选保管中')"><div class="num">6</div><div class="lbl">保管中</div></div>
+            <div class="stat" onclick="toast('演示：筛选待核验')"><div class="num">2</div><div class="lbl">待核验</div></div>
+            <div class="stat" onclick="toast('演示：筛选待交接')"><div class="num">1</div><div class="lbl">待交接</div></div>
+            <div class="stat alert" onclick="toast('演示：筛选超期')"><div class="num">1</div><div class="lbl">超期</div></div>
+          </div>
+          <div class="filter-bar">
+            <div class="seg"><button class="on">待审核</button><button>保管中</button><button>待核验</button><button>待交接</button><button>超期公示</button></div>
+            <input class="input" style="width:170px" placeholder="关键字 / 处理单号">
+            <div class="grow"></div>
+            <span class="muted">已停留时长实时计算</span>
+          </div>
+          <table class="table">
+            <colgroup><col style="width:8%"><col style="width:22%"><col style="width:11%"><col style="width:13%"><col style="width:11%"><col style="width:15%"><col style="width:20%"></colgroup>
+            <thead><tr><th>缩略图</th><th>物品名称 / 处理单号</th><th>上报人</th><th>上报时间</th><th>已停留</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><circle cx="12" cy="16" r="1"/></svg></div></td><td>白色 iPhone 15<br><span class="muted" style="font-size:11px">SEC-20261008-02</span></td><td>王**</td><td>10-08 08:10</td><td>2 小时</td><td><span class="tag t-pending">待审核</span></td><td><button class="btn btn-sm btn-primary" onclick="openModal('modalAudit')">审核</button><button class="btn btn-sm btn-ghost" style="margin-left:6px" onclick="openModal('modalDetail')">详情</button></td></tr>
+              <tr><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg></div></td><td>校园卡（一卡通）<br><span class="muted" style="font-size:11px">SEC-20261008-01</span></td><td>李**</td><td>10-08 09:35</td><td>1 小时</td><td><span class="tag t-pending">待审核</span></td><td><button class="btn btn-sm btn-primary" onclick="openModal('modalAudit')">审核</button><button class="btn btn-sm btn-ghost" style="margin-left:6px" onclick="openModal('modalDetail')">详情</button></td></tr>
+              <tr><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 8h6M9 12h6"/></svg></div></td><td>身份证 <span class="tag t-ovr" style="margin-left:6px">超时</span><br><span class="muted" style="font-size:11px">SEC-20261006-04</span></td><td>赵**</td><td>10-06 11:20</td><td><span class="overdue" style="color:var(--danger);font-weight:600">47 小时</span></td><td><span class="tag t-ovr">待审核 · 超时</span></td><td><button class="btn btn-sm btn-primary" onclick="openModal('modalAudit')">审核</button><button class="btn btn-sm btn-ghost" style="margin-left:6px" onclick="openModal('modalDetail')">详情</button></td></tr>
+              <tr><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a7 7 0 0 0-7 7c0 2.4 1.2 4.5 3 5.8V19h8v-4.2c1.8-1.3 3-3.4 3-5.8a7 7 0 0 0-7-7z"/><path d="M12 9v3M12 15.5v.5"/></svg></div></td><td>银色手表<br><span class="muted" style="font-size:11px">SEC-20261006-03</span></td><td>孙**</td><td>10-06 10:00</td><td>2 天</td><td><span class="tag t-queue">超期公示</span></td><td><button class="btn btn-sm btn-ghost" onclick="toast('演示：查看移交记录')">详情</button></td></tr>
+              <tr><td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg></div></td><td>华为 Mate 60<br><span class="muted" style="font-size:11px">SEC-20261007-03</span></td><td>钱**</td><td>10-07 16:40</td><td>17 小时</td><td><span class="tag t-verify">待核验</span></td><td><button class="btn btn-sm btn-primary" onclick="openModal('modalVerify')">核验</button><button class="btn btn-sm btn-ghost" style="margin-left:6px" onclick="openModal('modalDetail')">详情</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-14 贵重物品工作台</b>（新增）· 关联 FR-SEC-03 至 10 · 状态分栏 + 超时预警 + 凭证核验意见必填 · 侧边栏仅 3 项（菜单隔离）</div>
+    </section>
+
+    <!-- ===== 视图：贵重物品台账 P-ADM-15 ===== -->
+    <section class="view" id="view-adm15">
+      <div class="adm-wrap">
+        <aside class="adm-side sec" data-role="security" data-active="adm15">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 0-7 7c0 2.4 1.2 4.5 3 5.8V19h8v-4.2c1.8-1.3 3-3.4 3-5.8a7 7 0 0 0-7-7z"/></svg><span>保卫处工作台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>贵重物品处理台账 <span class="role-chip" style="background:#eef1f6;color:#22303f">保卫处 / 管理员</span></h3>
+          <div class="sub">全程可追溯 · 记录不可删除、不可修改（只能追加说明）· 可导出 Excel / CSV（FR-SEC-11、FR-SEC-12）</div>
+          <div class="filter-bar">
+            <input class="input" style="width:150px" placeholder="开始日期">
+            <input class="input" style="width:150px" placeholder="结束日期">
+            <select class="select" style="width:120px"><option>全部状态</option><option>待审核</option><option>保管中</option><option>待核验</option><option>待交接</option><option>已交接</option><option>已移交</option></select>
+            <input class="input" style="width:140px" placeholder="经办人">
+            <div class="grow"></div>
+            <button class="btn btn-primary btn-sm" onclick="toast('演示：导出 Excel / CSV（含全部台账字段）')">导出台账</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:14px">
+            <table class="table">
+              <colgroup><col style="width:20%"><col style="width:20%"><col style="width:13%"><col style="width:15%"><col style="width:13%"><col style="width:19%"></colgroup>
+              <thead><tr><th>处理单号</th><th>物品</th><th>上报人</th><th>当前状态</th><th>经办人</th><th>更新时间</th></tr></thead>
+              <tbody>
+                <tr onclick="openModal('modalLedger')" style="cursor:pointer"><td>SEC-20261008-01</td><td>校园卡（一卡通）</td><td>李**</td><td><span class="tag t-verify">待核验</span></td><td>保卫处 · 陈</td><td>10-08 11:05</td></tr>
+                <tr onclick="openModal('modalLedger')" style="cursor:pointer"><td>SEC-20261008-02</td><td>白色 iPhone 15</td><td>王**</td><td><span class="tag t-pending">待审核</span></td><td>—</td><td>10-08 08:10</td></tr>
+                <tr onclick="openModal('modalLedger')" style="cursor:pointer"><td>SEC-20261007-03</td><td>华为 Mate 60</td><td>钱**</td><td><span class="tag t-verify">待核验</span></td><td>保卫处 · 陈</td><td>10-08 09:00</td></tr>
+                <tr onclick="openModal('modalLedger')" style="cursor:pointer"><td>SEC-20261006-03</td><td>银色手表</td><td>孙**</td><td><span class="tag t-queue">超期公示</span></td><td>保卫处 · 王</td><td>10-06 15:30</td></tr>
+                <tr onclick="openModal('modalLedger')" style="cursor:pointer"><td>SEC-20261005-02</td><td>白色 iPhone 13</td><td>李**</td><td><span class="tag t-done">已交接</span></td><td>保卫处 · 王</td><td>10-05 11:20</td></tr>
+                <tr onclick="openModal('modalLedger')" style="cursor:pointer"><td>SEC-20260928-04</td><td>校园卡（一卡通）</td><td>张**</td><td><span class="tag t-done">已移交</span></td><td>保卫处 · 陈</td><td>10-01 09:00</td></tr>
+              </tbody>
+            </table>
+            <div class="card" style="padding:14px">
+              <h4 style="font-size:14px;margin-bottom:12px">SEC-20261008-01 状态时间轴 <span class="tag t-verify" style="margin-left:6px">待核验</span></h4>
+              <div class="timeline">
+                <div class="tl-item done"><div class="t">上报保卫处</div><div class="m">2026-10-08 09:35 · 拾获者李**提交，移交方式：送交保卫处</div></div>
+                <div class="tl-item done"><div class="t">审核通过 → 保管中</div><div class="m">2026-10-08 10:00 · 录入存放位置：保卫处 3 号柜 A-12</div><div class="who">责任人：陈**</div></div>
+                <div class="tl-item done"><div class="t">认领申请提交 + 凭证上传</div><div class="m">2026-10-08 10:20 · 认领人徐**上传身份证明与购买凭证 2 张</div></div>
+                <div class="tl-item"><div class="t">凭证核验（待核验）</div><div class="m">2026-10-08 11:05 · 核验要点 4/4，意见：凭证与描述一致，建议线下核实</div><div class="who">核验人：陈**</div></div>
+                <div class="tl-item"><div class="t">线下交接（待交接）</div><div class="m">待安排 · 交接时间 / 经办人 / 见证人 / 签收方式</div></div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:14px">
+                <button class="btn btn-sm btn-primary" onclick="openModal('modalSignoff')">打印签收单</button>
+                <button class="btn btn-sm btn-ghost" onclick="toast('演示：安排线下核实')">安排线下核实</button>
+                <button class="btn btn-sm btn-ghost" onclick="toast('演示：追加说明（唯一可写操作）')">追加说明</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-15 贵重物品台账</b>（新增）· 关联 FR-SEC-11、FR-SEC-12 · 时间轴详情 + 打印签收单 + 导出归档</div>
+    </section>
+
+    <!-- ===== 视图：个人中心 P-ADM-16 ===== -->
+    <section class="view" id="view-adm16">
+      <div class="adm-wrap">
+        <aside class="adm-side" data-role="admin" data-active="adm16">
+          <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4z"/></svg><span>失物招领后台</span></div>
+          <nav></nav>
+          <button class="fold" onclick="toggleFold(this)" title="折叠侧边栏">‹</button>
+        </aside>
+        <div class="adm-body">
+          <h3>个人中心 <span class="role-chip">管理员</span></h3>
+          <div class="sub">账号信息与安全设置 · 修改密码需校验原密码（FR-AUTH-09）</div>
+          <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:14px">
+            <div class="card" style="padding:16px">
+              <h4 style="font-size:14px;margin-bottom:12px">账号信息</h4>
+              <div style="display:flex;align-items:center;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--border-light)">
+                <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#0081ff,#4da3ff);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700">管</div>
+                <div>
+                  <div style="font-size:15px;font-weight:700">admin（管理员）</div>
+                  <div style="font-size:12px;color:var(--text3);margin-top:3px">所属角色：管理员 · 12 项菜单 · 保卫处账号独立隔离</div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-top:14px;font-size:13px">
+                <div class="form-row" style="margin:0"><label>账号</label><input class="input" value="admin" readonly style="background:#f5f7fa"></div>
+                <div class="form-row" style="margin:0"><label>姓名</label><input class="input" value="系统管理员"></div>
+                <div class="form-row" style="margin:0"><label>联系电话</label><input class="input" value="0431-8509****"></div>
+                <div class="form-row" style="margin:0"><label>最近登录</label><input class="input" value="2026-10-08 08:52" readonly style="background:#f5f7fa"></div>
+              </div>
+              <button class="btn btn-primary btn-sm" style="margin-top:14px" onclick="toast('演示：保存成功')">保存资料</button>
+            </div>
+            <div class="card" style="padding:16px">
+              <h4 style="font-size:14px;margin-bottom:12px">修改密码</h4>
+              <div class="form-row"><label>原密码</label><input class="input" type="password" placeholder="请输入原密码" onfocus="toast('演示：修改密码需校验原密码')"></div>
+              <div class="form-row"><label>新密码</label><input class="input" type="password" placeholder="8-20 位，含字母与数字"></div>
+              <div class="form-row"><label>确认新密码</label><input class="input" type="password" placeholder="再次输入新密码"></div>
+              <div class="credit-tip" style="margin-bottom:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg>连续输错原密码 5 次将锁定 15 分钟（FR-AUTH-06）</div>
+              <button class="btn btn-primary btn-sm" style="margin-top:14px" onclick="toast('演示：密码已修改，下次登录生效')">修改密码</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="adm-note"><b>P-ADM-16 个人中心</b>（保留）· 关联 FR-AUTH-09 · 角色信息 + 密码修改</div>
+    </section>
+
+    <!-- PART_VIEWS -->
+  </div>
+</div>
+
+<!-- ===== 弹窗集合 ===== -->
+<div class="modal-mask" id="modalAudit">
+  <div class="modal wide">
+    <h3>审核：校园卡（一卡通）</h3>
+    <div class="sub">完整信息 + 图片大图 · 审核结果需附原因 · 弹窗宽度 ≤ 800px（UI-ADP-02）</div>
+    <div style="display:flex;gap:14px">
+      <div style="width:150px;height:150px;background:linear-gradient(135deg,#dceafb,#eef6ff);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#8fc2f0;flex-shrink:0"><svg style="width:52px;height:52px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg></div>
+      <div style="font-size:13px;line-height:2">
+        发布者：李**（L5 诚信模范）<br>
+        类型：寻失主 · 证件类 · 已勾选<strong>贵重物品</strong><br>
+        描述：蓝色卡套，正面贴有白色贴纸，背面有手写姓名缩写<br>
+        拾获地点：图书馆二楼大厅 · 2026-10-08 09:30
+      </div>
+    </div>
+    <div style="margin-top:14px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">审核操作</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-success" onclick="closeModal('modalAudit');toast('已通过，贵重物品转入保卫处保管')">通过</button>
+        <button class="btn btn-sm btn-ghost" onclick="closeModal('modalAudit');toast('已退回补充，原因已通知发布者')">驳回（必选原因）</button>
+        <button class="btn btn-sm btn-ghost" onclick="closeModal('modalAudit');toast('已标记为贵重物品，触发保卫处流程')">标记为贵重物品</button>
+        <button class="btn btn-sm btn-danger" onclick="closeModal('modalAudit');toast('已判定虚假并扣分，信用流水已留痕')">判定虚假并扣分</button>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-top:10px;font-weight:600">快捷驳回原因</div>
+      <div class="reason-list">
+        <label><input type="radio" name="rej1"> 信息不完整（缺少关键描述或图片）</label>
+        <label><input type="radio" name="rej1"> 含违规内容</label>
+        <label><input type="radio" name="rej1" checked> 疑似虚假信息</label>
+        <label><input type="radio" name="rej1"> 重复发布</label>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalAudit')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalBatch">
+  <div class="modal">
+    <h3>批量操作确认</h3>
+    <div class="sub">请确认批量操作范围</div>
+    <div class="credit-tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg>将<strong>对选中的 2 条信息执行批量通过</strong>，请确认所选信息均合规</div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalBatch')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('modalBatch');toast('演示：已批量通过 2 条')">确认执行</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalDel">
+  <div class="modal">
+    <h3>删除确认</h3>
+    <div class="sub">危险操作 · 二次确认（ST-10）</div>
+    <div class="credit-tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg>删除后该信息将<strong>不可恢复</strong>，并记录操作日志（FR-ADMIN-12）。确认删除所选记录？</div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalDel')">取消</button>
+      <button class="btn btn-danger" onclick="closeModal('modalDel');toast('演示：已删除，操作日志已留痕')">确认删除</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalBan">
+  <div class="modal">
+    <h3>封禁账号确认</h3>
+    <div class="sub">封禁后该用户无法登录与发布（FR-ADMIN-07）</div>
+    <div class="form-row"><label>封禁时长</label><select class="select"><option>7 天</option><option>30 天</option><option>永久封禁</option></select></div>
+    <div class="form-row"><label>封禁原因 <span class="req">*</span></label><textarea class="input" style="min-height:60px;resize:vertical;font-family:inherit">恶意认领，多次发布虚假信息</textarea></div>
+    <div class="credit-tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg>封禁操作将写入操作日志，原因对用户可见</div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalBan')">取消</button>
+      <button class="btn btn-danger" onclick="closeModal('modalBan');toast('演示：已封禁 7 天')">确认封禁</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalUnban">
+  <div class="modal">
+    <h3>解封账号确认</h3>
+    <div class="sub">解封后该用户可正常登录与发布</div>
+    <div class="form-row"><label>解封原因 <span class="req">*</span></label><textarea class="input" style="min-height:60px;resize:vertical;font-family:inherit">封禁期满，且已完成信用教育承诺</textarea></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalUnban')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('modalUnban');toast('演示：已解封')">确认解封</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalDetail">
+  <div class="modal wide">
+    <h3>信息详情</h3>
+    <div class="sub">完整信息 · 与前台展示保持一致</div>
+    <div style="display:flex;gap:14px">
+      <div style="width:140px;height:140px;background:linear-gradient(135deg,#dceafb,#eef6ff);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#8fc2f0;flex-shrink:0"><svg style="width:46px;height:46px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg></div>
+      <div style="font-size:13px;line-height:2">
+        物品名称：黑色蓝牙耳机（左耳）<br>
+        信息类型：寻失主 · 电子设备类<br>
+        发布者：张** 55230412（L3 良好）<br>
+        拾获地点：三教 305 教室 · 2026-10-07 12:40<br>
+        状态：<span class="tag t-pub">已发布</span> · 认领次数：1（已撤回）
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalDetail')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalClaim">
+  <div class="modal wide">
+    <h3>认领申请核验</h3>
+    <div class="sub">凭证多图对比 · 核验要点勾选 · 核验意见必填（FR-CLAIM-09）</div>
+    <div style="display:flex;gap:14px">
+      <div style="flex:1;font-size:13px;line-height:2">
+        物品：校园卡（一卡通）<span class="tag t-valuable" style="margin-left:6px">贵重</span><br>
+        认领人：徐** 55230217（L4 优秀）<br>
+        提交时间：2026-10-08 10:20<br>
+        交接意向：保卫处现场交接
+      </div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600;margin-bottom:6px">上传凭证（2 张）</div>
+        <div style="display:flex;gap:8px">
+          <div style="width:88px;height:88px;background:linear-gradient(135deg,#dceafb,#eef6ff);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#8fc2f0"><svg style="width:26px;height:26px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 8h6M9 12h6"/></svg></div>
+          <div style="width:88px;height:88px;background:linear-gradient(135deg,#dceafb,#eef6ff);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#8fc2f0"><svg style="width:26px;height:26px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 8h6M9 12h6"/></svg></div>
+          <button class="btn btn-sm btn-ghost" style="height:88px" onclick="toast('演示：放大对比凭证')">放大</button>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">核验要点</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <label class="check"><input type="checkbox" checked> 凭证与物品特征描述一致</label>
+        <label class="check"><input type="checkbox" checked> 凭证姓名 / 学号与认领人一致</label>
+        <label class="check"><input type="checkbox" checked> 购买凭证时间在丢失之前</label>
+        <label class="check"><input type="checkbox"> 身份证明有效</label>
+      </div>
+      <div class="form-row" style="margin-top:12px"><label>核验意见 <span class="req">*</span></label><textarea class="input" style="min-height:56px;resize:vertical;font-family:inherit">凭证与描述一致，建议安排线下核实（示例）</textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalClaim')">关闭</button>
+      <button class="btn btn-success" onclick="closeModal('modalClaim');toast('演示：核验通过，进入待交接')">核验通过</button>
+      <button class="btn btn-danger" onclick="closeModal('modalClaim');toast('演示：核验不通过，已通知认领人')">核验不通过</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalCredit">
+  <div class="modal">
+    <h3>人工调整信用分</h3>
+    <div class="sub">调整原因必填 · 操作留痕（操作人 / 时间 / 原值 / 新值 / 原因）</div>
+    <div style="display:flex;gap:10px;margin-bottom:14px">
+      <div style="flex:1;background:var(--bg);border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text3)">用户</div><div style="font-size:14px;font-weight:700;margin-top:3px">周** 55230812</div></div>
+      <div style="flex:1;background:var(--bg);border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text3)">当前信用分</div><div style="font-size:14px;font-weight:700;margin-top:3px">42（L1 失信）</div></div>
+    </div>
+    <div class="form-row"><label>调整分值（负数扣分 / 正数加分）</label><input class="input" type="number" value="-15" onfocus="toast('演示：输入调整分值')"></div>
+    <div class="form-row"><label>调整原因 <span class="req">*</span></label><textarea class="input" style="min-height:60px;resize:vertical;font-family:inherit">多次发布虚假信息，经审核确认（示例）</textarea></div>
+    <div class="credit-tip" style="margin-bottom:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17v.5"/><circle cx="12" cy="12" r="9"/></svg>L1 失信（&lt;60 分）将自动禁止认领并限制日发布 2 条</div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalCredit')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('modalCredit');toast('演示：调整已生效并留痕')">确认调整</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalFlow">
+  <div class="modal wide">
+    <h3>信用流水</h3>
+    <div class="sub">徐晓阳 55230217 · 当前 108 分（L4 优秀）</div>
+    <table class="table">
+      <thead><tr><th>时间</th><th>事件</th><th>变动</th><th>变动后</th><th>关联物品</th><th>操作人</th></tr></thead>
+      <tbody>
+        <tr><td>2026-10-07 14:20</td><td>归还普通物品</td><td style="color:var(--success);font-weight:700">+5</td><td>103</td><td>灰色双肩背包</td><td>系统</td></tr>
+        <tr><td>2026-10-06 10:05</td><td>按约完成认领</td><td style="color:var(--success);font-weight:700">+2</td><td>98</td><td>银色无线耳机</td><td>系统</td></tr>
+        <tr><td>2026-10-01 00:00</td><td>连续无违规（30 天）</td><td style="color:var(--success);font-weight:700">+2</td><td>96</td><td>—</td><td>系统</td></tr>
+        <tr><td>2026-09-28 18:00</td><td>逾期未交接</td><td style="color:var(--danger);font-weight:700">-10</td><td>94</td><td>校园卡（一卡通）</td><td>系统</td></tr>
+        <tr><td>2026-09-20 09:12</td><td>发布虚假信息 <span class="tag t-verify" style="margin-left:6px">申诉中</span></td><td style="color:var(--danger);font-weight:700">-5</td><td>104</td><td>失物信息 #10211</td><td>admin</td></tr>
+      </tbody>
+    </table>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalFlow')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalCat">
+  <div class="modal">
+    <h3>编辑分类</h3>
+    <div class="sub">分类启停即时生效，前台发布选项同步更新</div>
+    <div class="form-row"><label>分类名称 <span class="req">*</span></label><input class="input" value="电子设备类"></div>
+    <div class="form-row"><label>说明</label><textarea class="input" style="min-height:56px;resize:vertical;font-family:inherit">手机、耳机、充电宝、笔记本等</textarea></div>
+    <div class="form-row"><label>排序（数字越小越靠前）</label><input class="input" type="number" value="2"></div>
+    <div class="form-row" style="margin-bottom:0"><label>状态</label>
+      <div style="display:flex;gap:10px">
+        <label class="check"><input type="radio" name="catst" checked> 启用</label>
+        <label class="check"><input type="radio" name="catst"> 停用</label>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalCat')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('modalCat');toast('演示：分类已保存')">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalUpload">
+  <div class="modal">
+    <h3>上传 / 编辑轮播图</h3>
+    <div class="sub">建议尺寸 1920 × 480 · JPG / PNG ≤ 2MB</div>
+    <div style="height:120px;border:1px dashed #c0c4cc;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);font-size:12px;gap:6px;background:#fafbfc;cursor:pointer" onclick="toast('演示：选择图片上传，上传后即时预览')">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
+      点击上传图片
+    </div>
+    <div class="form-row" style="margin-top:14px"><label>跳转链接</label><input class="input" value="/rank" onfocus="toast('演示：输入跳转链接')"></div>
+    <div class="form-row"><label>排序</label><input class="input" type="number" value="1"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalUpload')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('modalUpload');toast('演示：轮播图已保存并预览')">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalReport">
+  <div class="modal">
+    <h3>处理举报</h3>
+    <div class="sub">举报：发布疑似虚假信息「灰色双肩背包」</div>
+    <div style="font-size:13px;line-height:2;background:var(--bg);border-radius:8px;padding:12px;margin-bottom:12px">
+      被举报信息：灰色双肩背包（寻失物）<br>
+      发布者：周** 55230812（L1 失信，已有 2 条失信记录）<br>
+      举报理由：疑似虚假信息 · 图片与描述不符
+    </div>
+    <div class="form-row"><label>处理结果</label>
+      <div class="reason-list">
+        <label><input type="radio" name="rpt" checked> 举报属实 · 删除信息并扣信用分 20</label>
+        <label><input type="radio" name="rpt"> 举报不属实 · 驳回举报</label>
+        <label><input type="radio" name="rpt"> 信息下架 · 要求补充材料</label>
+      </div>
+    </div>
+    <div class="form-row"><label>处理说明 <span class="req">*</span></label><textarea class="input" style="min-height:56px;resize:vertical;font-family:inherit">图片与描述不一致，多次发布疑似虚假信息（示例）</textarea></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalReport')">取消</button>
+      <button class="btn btn-danger" onclick="closeModal('modalReport');toast('演示：已处理，信用扣分联动 P-ADM-08')">确认处理</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalAppeal">
+  <div class="modal">
+    <h3>处理申诉</h3>
+    <div class="sub">申诉：对「发布虚假信息」扣分提出申诉</div>
+    <div style="font-size:13px;line-height:2;background:var(--bg);border-radius:8px;padding:12px;margin-bottom:12px">
+      申诉人：周** 55230812<br>
+      原扣分：-5（2026-09-20 09:12，操作人 admin）<br>
+      申诉理由：该信息为真实招领信息，已提供拾获地点监控截图（示例）
+    </div>
+    <div class="form-row"><label>处理结果</label>
+      <div class="reason-list">
+        <label><input type="radio" name="app" checked> 申诉成立 · 恢复信用分并撤销记录</label>
+        <label><input type="radio" name="app"> 申诉不成立 · 维持原扣分（原因必填）</label>
+      </div>
+    </div>
+    <div class="form-row"><label>处理说明 <span class="req">*</span></label><textarea class="input" style="min-height:56px;resize:vertical;font-family:inherit">监控截图有效，予以恢复（示例）</textarea></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalAppeal')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('modalAppeal');toast('演示：申诉已处理，信用分恢复')">确认处理</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalVerify">
+  <div class="modal wide">
+    <h3>凭证核验</h3>
+    <div class="sub">华为 Mate 60 · SEC-20261007-03 · 凭证多图对比 / 放大 / 旋转（FR-SEC-08）</div>
+    <div style="display:flex;gap:14px">
+      <div style="flex:1;font-size:13px;line-height:2">
+        上报人：钱** 55230933<br>
+        拾获地点：综合楼大厅<br>
+        当前状态：<span class="tag t-verify">待核验</span><br>
+        已停留：17 小时
+      </div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600;margin-bottom:6px">认领凭证（3 张）</div>
+        <div style="display:flex;gap:8px">
+          <div style="width:76px;height:76px;background:linear-gradient(135deg,#dceafb,#eef6ff);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#8fc2f0"><svg style="width:22px;height:22px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 8h6M9 12h6"/></svg></div>
+          <div style="width:76px;height:76px;background:linear-gradient(135deg,#dceafb,#eef6ff);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#8fc2f0"><svg style="width:22px;height:22px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 8h6M9 12h6"/></svg></div>
+          <button class="btn btn-sm btn-ghost" style="height:76px" onclick="toast('演示：放大对比')">放大</button>
+          <button class="btn btn-sm btn-ghost" style="height:76px" onclick="toast('演示：旋转凭证')">旋转</button>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">核验要点</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <label class="check"><input type="checkbox" checked> 凭证与物品特征一致</label>
+        <label class="check"><input type="checkbox" checked> 认领人身份与凭证一致</label>
+        <label class="check"><input type="checkbox"> 购买凭证时间在丢失前</label>
+      </div>
+      <div class="form-row" style="margin-top:12px"><label>核验意见 <span class="req">*</span></label><textarea class="input" style="min-height:56px;resize:vertical;font-family:inherit">凭证完整，建议安排线下核实（示例）</textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalVerify')">关闭</button>
+      <button class="btn btn-success" onclick="closeModal('modalVerify');toast('演示：核验通过，进入待交接')">核验通过</button>
+      <button class="btn btn-danger" onclick="closeModal('modalVerify');toast('演示：核验不通过，已通知认领人')">核验不通过</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalLedger">
+  <div class="modal wide">
+    <h3>台账详情 · SEC-20261008-01</h3>
+    <div class="sub">校园卡（一卡通）· 全流程时间轴 · 记录不可修改（只能追加说明）</div>
+    <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:16px">
+      <div style="font-size:13px;line-height:2.1">
+        物品名称：校园卡（一卡通）<br>
+        上报人：李** 55230110<br>
+        分类：证件类 · 贵重物品<br>
+        存放位置：保卫处 3 号柜 A-12<br>
+        当前状态：<span class="tag t-verify">待核验</span><br>
+        关联信用事件：认领人徐**（L4）
+      </div>
+      <div class="timeline">
+        <div class="tl-item done"><div class="t">上报保卫处</div><div class="m">2026-10-08 09:35 · 移交方式：送交保卫处</div></div>
+        <div class="tl-item done"><div class="t">审核通过 → 保管中</div><div class="m">2026-10-08 10:00 · 录入 3 号柜 A-12</div><div class="who">责任人：陈**</div></div>
+        <div class="tl-item done"><div class="t">认领申请 + 凭证上传</div><div class="m">2026-10-08 10:20 · 凭证 2 张</div></div>
+        <div class="tl-item"><div class="t">凭证核验（待核验）</div><div class="m">2026-10-08 11:05 · 要点 4/4，意见已填</div><div class="who">核验人：陈**</div></div>
+        <div class="tl-item"><div class="t">线下交接</div><div class="m">待安排 · 签收单可打印</div></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalLedger')">关闭</button>
+      <button class="btn btn-primary" onclick="closeModal('modalLedger');toast('演示：打开签收单打印')">打印签收单</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalSignoff">
+  <div class="modal wide">
+    <h3>交接签收单（打印视图）</h3>
+    <div class="sub">打印友好的签收单模板 · 交接记录不可修改（FR-SEC-10）</div>
+    <div style="border:1px solid var(--border);border-radius:8px;padding:20px 24px">
+      <div style="text-align:center;font-size:16px;font-weight:700;margin-bottom:4px">校园失物招领平台 · 贵重物品交接签收单</div>
+      <div style="text-align:center;font-size:11px;color:var(--text3);margin-bottom:16px">处理单号：SEC-20261008-01 · 打印时间：2026-10-08 12:00</div>
+      <table class="table" style="border:1px solid var(--border-light)">
+        <colgroup><col style="width:22%"><col style="width:28%"><col style="width:22%"><col style="width:28%"></colgroup>
+        <tbody>
+          <tr><th style="background:var(--bg)">物品名称</th><td>校园卡（一卡通）</td><th style="background:var(--bg)">存放位置</th><td>保卫处 3 号柜 A-12</td></tr>
+          <tr><th style="background:var(--bg)">拾获人</th><td>李** 55230110</td><th style="background:var(--bg)">认领人</th><td>徐** 55230217</td></tr>
+          <tr><th style="background:var(--bg)">交接时间</th><td>2026-10-08 14:00</td><th style="background:var(--bg)">交接地点</th><td>保卫处服务窗口</td></tr>
+          <tr><th style="background:var(--bg)">经办人</th><td>陈**</td><th style="background:var(--bg)">见证人</th><td>王**</td></tr>
+          <tr><th style="background:var(--bg)">签收方式</th><td>现场签字确认</td><th style="background:var(--bg)">认领人签字</th><td>＿＿＿＿＿＿</td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px">本单由保卫处盖章生效，一式两份，保卫处与认领人各执一份。</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modalSignoff')">关闭</button>
+      <button class="btn btn-primary" onclick="closeModal('modalSignoff');toast('演示：调起浏览器打印')">打印</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== 后台侧边栏菜单（双角色隔离） ===== */
+var ADM_MENUS = {
+  admin: [
+    ['adm02','工作台首页','M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4z'],
+    ['adm03','信息审核','M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11'],
+    ['adm04','失物信息管理','M20 7h-8m8 5h-8m8 5h-8M8 5v14m-2-14h4a0 0 0 0 1 0 0v2a2 2 0 0 1-4 0V5zm2 10h-2m2-2h-2m2-2h-2'],
+    ['adm05','招领信息管理','M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM14 2v6h6M9 13h6M9 17h4'],
+    ['adm06','用户管理','M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm13 10v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8'],
+    ['adm07','认领记录管理','M4 12l5 5L20 6'],
+    ['adm08','信用管理','M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6l-8-4zM9 12l2 2 4-4'],
+    ['adm09','分类管理','M22 3H2l8 9v7l4 2v-9l8-9z'],
+    ['adm10','轮播图管理','M4 5h16v14H4V5zm4 10l3-4 2 3 2-2 3 3M8 9h.01M16 9h.01'],
+    ['adm11','举报与申诉处理','M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10zM8 9h8M8 13h5'],
+    ['adm12','操作日志','M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM14 2v6h6M9 13h6M9 17h6'],
+    ['adm13','数据统计','M4 20V10m6 10V4m6 16v-6m4 6H2'],
+    ['adm16','个人中心','M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z']
+  ],
+  security: [
+    ['adm14','贵重物品工作台','M12 2a7 7 0 0 0-7 7c0 2.4 1.2 4.5 3 5.8V19h8v-4.2c1.8-1.3 3-3.4 3-5.8a7 7 0 0 0-7-7zM12 14v2M12 7v3'],
+    ['adm15','贵重物品台账','M8 3h8l4 4v14H4V7l4-4zM8 3v4h8V3M8 12h8M8 16h8M8 8h.01M16 8h.01'],
+    ['','贵重物品说明','M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 11v5M12 8v.5']
+  ]
+};
+function renderSidebars(){
+  document.querySelectorAll('.adm-side').forEach(function(aside){
+    var role = aside.dataset.role, active = aside.dataset.active;
+    var nav = aside.querySelector('nav');
+    if(!nav) return;
+    nav.innerHTML = '';
+    ADM_MENUS[role].forEach(function(m){
+      var a = document.createElement('a');
+      if(m[0]){
+        a.href = '#' + m[0];
+        a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="' + m[2] + '"/></svg><span>' + m[1] + '</span>';
+        if(m[0] === active) a.className = 'on';
+      } else {
+        a.style.cursor = 'pointer';
+        a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="' + m[2] + '"/></svg><span>' + m[1] + '</span>';
+        a.addEventListener('click', function(){ toast('演示：贵重物品说明（含分类标准、保管规范与交接流程文档）'); });
+      }
+      nav.appendChild(a);
+    });
+  });
+}
+function toggleFold(btn){
+  var aside = btn.closest('.adm-side');
+  aside.classList.toggle('collapsed');
+  btn.textContent = aside.classList.contains('collapsed') ? '›' : '‹';
+}
+
+/* ===== 路由与导航 ===== */
+var views = document.querySelectorAll('.view');
+var navs = document.querySelectorAll('.stage-side a');
+function goto(h){ location.hash = h; applyRoute(); }
+function applyRoute(){
+  var h = (location.hash || '#adm01').replace('#','');
+  var target = document.getElementById('view-' + h) || document.getElementById('view-adm01');
+  views.forEach(function(v){ v.classList.remove('on'); });
+  target.classList.add('on');
+  navs.forEach(function(a){ a.classList.toggle('on', a.getAttribute('href') === '#' + h); });
+  target.scrollIntoView({block:'start'});
+}
+window.addEventListener('hashchange', applyRoute);
+
+/* ===== 提示 ===== */
+var toastEl = document.getElementById('toast');
+var toastTimer = null;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ toastEl.classList.remove('on'); }, 2200);
+}
+function openModal(id){ document.getElementById(id).classList.add('on'); }
+function closeModal(id){ document.getElementById(id).classList.remove('on'); }
+
+/* ===== 演示交互：筛选标签切换 ===== */
+document.querySelectorAll('.filter-bar .seg, .tabbar-tabs').forEach(function(seg){
+  seg.querySelectorAll('button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      seg.querySelectorAll('button').forEach(function(b){ b.classList.remove('on'); });
+      btn.classList.add('on');
+    });
+  });
+});
+
+renderSidebars();
+applyRoute();
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# 基线文件清单 WS_BL-1
+# 生成时间 2026-11-13
+# 字段: SHA256 | 字节数 | 相对路径
+# 初始阶段基线，含计划、选题、工具、角色、决议与管理方案
+d1dc14d9594ea0a02cfe4a9792cb562f1f39e68cff911568bc4d81b85aa40b63 | 9101 | 55230420-马明昂-小组角色分配及选题表.xlsx
+abb7b9a6ac9d5a7d1bdfa444f2e4fcb83ae2158e9415c107344a7255fac8f52a | 19012 | 工具选择情况说明.docx
+13e46370dcf50de5343ec7190f9cf29df969f32a0aec426114af32d49fdb1866 | 145003 | 配置管理计划.docx
+acf03e480a16569b9d5b837483ab0b81f89d098e35dfa16e163e08e30d52753b | 38297 | 配置管理启动会决议.docx
+13c5b70822598c5b7abdc13350ea1206a695ede84cb58da6c01f65dc8c9cba1c | 38648 | 配置库备份与恢复方案.docx
+d7412f8a44c83d40af3f366b4c09a96cf797049bf1481f595083cedb3e1de78a | 44166 | 软件开发计划(1).docx
+725f23cc009cf9deab9f085c005e2ed11932e047cb56b642c8be7b9be14a0c0a | 36922 | 项目组选题说明.docx
+# 文件数: 7

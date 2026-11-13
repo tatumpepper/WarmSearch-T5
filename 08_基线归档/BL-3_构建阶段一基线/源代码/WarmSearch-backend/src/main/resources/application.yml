@@ -1,0 +1,48 @@
+server:
+  port: 8091
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: warmsearch
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/warmsearch?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: priv.ljh.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+warmsearch:
+  upload:
+    path: D:/编译原理/失物招领/WarmSearch-backend/upload/
+    url-prefix: /upload
+  jwt:
+    secret: warmsearch-secret-key-2026-lijinghai-credit-security
+    expire: 86400
+    header: Authorization
+
+logging:
+  level:
+    priv.ljh: debug

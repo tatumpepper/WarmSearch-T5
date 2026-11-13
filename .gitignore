@@ -1,7 +1,11 @@
-﻿# 临时文件
+# 临时文件
 *.tmp
 *.log
 Thumbs.db
 $RECYCLE.BIN/
-# Office临时文件
+# Office 临时文件
 ~$*
+# 预览缓存（artifact-preview 生成，不属于配置项）
+.preview/
+# 压缩包解压临时目录
+extracted*/
